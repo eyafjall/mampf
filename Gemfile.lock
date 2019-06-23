@@ -162,6 +162,8 @@ GEM
       tty-pager (~> 0.12.0)
       tty-screen (~> 0.6.5)
       tty-tree (~> 0.3.0)
+    fast_jsonapi (1.5)
+      activesupport (>= 4.2)
     fastimage (2.1.5)
     ffi (1.11.1)
     filesize (0.2.0)
@@ -516,6 +518,7 @@ DEPENDENCIES
   erubis
   factory_bot_rails
   faker
+  fast_jsonapi
   fastimage
   filesize
   fuzzy-string-match

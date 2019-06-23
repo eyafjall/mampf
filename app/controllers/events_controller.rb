@@ -17,9 +17,7 @@ class EventsController < ApplicationController
 
   def new_vertex_quizzables
     type = params[:type]
-    quizzables = type.constantize.all
-                     .map { |q| { value: q.id, text: q.extended_label }}
-    render json: quizzables
+    render json: MediumSerializer.new(type.constantize.all).serialized_json
   end
 
   def new_vertex_quizzable_text
