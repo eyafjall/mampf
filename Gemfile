@@ -76,6 +76,8 @@ gem 'kaminari-i18n'
 gem 'trix-rails', require: 'trix'
 gem 'ruby-graphviz'
 gem 'xkcd'
+gem 'mysql2', '~> 0.3'
+gem 'thinking-sphinx', '~>4.3'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

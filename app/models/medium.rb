@@ -74,6 +74,8 @@ class Medium < ApplicationRecord
   # to find out whether the cache is out of date, always touch'em after saving
   after_save :touch_teachable
 
+  after_save ThinkingSphinx::RealTime.callback_for(:medium)
+
   # after creation, this creates an item of type 'self' that is just a wrapper
   # around this medium, so the medium itself can be referenced from other media
   # as an item as well
