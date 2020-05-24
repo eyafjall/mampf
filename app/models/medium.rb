@@ -5,6 +5,7 @@ class Medium < ApplicationRecord
 
   # a teachable is a course/lecture/lesson
   belongs_to :teachable, polymorphic: true, optional: true
+  acts_as_list scope: [:teachable_id, :teachable_type], top_of_list: 0
 
   # a teachable may belong to a quizzable (quiz/question/remark)
   belongs_to :quizzable, polymorphic: true, optional: true
@@ -386,34 +387,36 @@ class Medium < ApplicationRecord
       [teachable.lecture&.teacher] + teachable.course.editors.to_a).uniq.compact
   end
 
-  # creates a .vtt file (and returns its path), which contains
+
+  # creates a .vtt tmp file (and returns it), which contains
   # all data needed by the thyme player to realize the toc
   def toc_to_vtt
-    path = toc_path
-    File.open(path, 'w+:UTF-8') do |f|
-      f.write vtt_start
-      proper_items_by_time.reject(&:hidden).each do |i|
-        f.write i.vtt_time_span
-        f.write i.vtt_reference
-      end
+    file = Tempfile.new(['toc-', '.vtt'], encoding: 'UTF-8')
+    file.write vtt_start
+    proper_items_by_time.reject(&:hidden).each do |i|
+      file.write i.vtt_time_span
+      file.write i.vtt_reference
     end
-    path
+    file
   end
 
-  # creates a .vtt file (and returns its path), which contains
+  # creates a .vtt file (and returns it), which contains
   # all data needed by the thyme player to realize references
   # Note: Only references to unlocked media will be incorporated.
   def references_to_vtt
-    path = references_path
-    File.open(path, 'w+:UTF-8') do |f|
-      f.write vtt_start
-      referrals_by_time.select { |r| r.item_published? && !r.item_locked? }
-                       .each do |r|
-        f.write r.vtt_time_span
-        f.write JSON.pretty_generate(r.vtt_properties) + "\n\n"
-      end
+    file = Tempfile.new(['ref-', '.vtt'], encoding: 'UTF-8')
+    file.write vtt_start
+    referrals_by_time.select { |r| r.item_published? && !r.item_locked? }
+                     .each do |r|
+      file.write r.vtt_time_span
+      file.write JSON.pretty_generate(r.vtt_properties) + "\n\n"
     end
-    path
+    file
+  end
+
+  def create_vtt_container!
+    VttContainer.create(table_of_contents: toc_to_vtt,
+                        references: references_to_vtt)
   end
 
   # some plain methods for items and referrals
@@ -642,12 +645,6 @@ class Medium < ApplicationRecord
     teachable_type + '-' + teachable_id.to_s
   end
 
-  # returns the position of this medium among all media of the same sort
-  # associated to the same teachable (by id)
-  def position
-    teachable.media.where(sort: sort).order(:id).pluck(:id).index(id) + 1
-  end
-
   # media associated to the same teachable and of the same sort
   def siblings
     teachable.media.where(sort: sort)
@@ -860,6 +857,27 @@ class Medium < ApplicationRecord
     result
   end
 
+  def script_items_importable?
+    return unless teachable_type == 'Lesson'
+    return unless teachable.lecture.content_mode == 'manuscript'
+    return unless teachable.script_items.any?
+    true
+  end
+
+  def import_script_items!
+    return unless teachable_type == 'Lesson'
+    return unless teachable.lecture.content_mode == 'manuscript'
+    items = teachable.script_items
+    return unless items.any?
+    items.each_with_index.each do |i, j|
+      Item.create(start_time: TimeStamp.new(h: 0, m:0, s: 0, ms: j),
+                  sort: i.sort, description: i.description,
+                  medium: self, section: i.section,
+                  ref_number: i.ref_number,
+                  related_items: [i])
+    end
+  end
+
   private
 
   # media of type kaviar associated to a lesson and script do not require
@@ -906,14 +924,6 @@ class Medium < ApplicationRecord
     end
     return unless teachable.lesson.present? && teachable.lesson.persisted?
     teachable.lesson.touch
-  end
-
-  def toc_path
-    Rails.root.join('public', 'tmp').to_s + '/toc-' + SecureRandom.hex + '.vtt'
-  end
-
-  def references_path
-    Rails.root.join('public', 'tmp').to_s + '/ref-' + SecureRandom.hex + '.vtt'
   end
 
   def vtt_start

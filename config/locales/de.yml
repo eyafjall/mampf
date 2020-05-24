@@ -146,6 +146,8 @@ de:
       terms: 'Semester'
       classification: 'Systematik'
       news: 'News'
+      boards: 'Foren'
+      stats: 'Zugriffsstatistik'
       users: 'Nutzerverwaltung'
       course: 'Modul'
       profile: 'Mein Profil'
@@ -1259,6 +1261,7 @@ de:
       take_time: 'Zeit aus Video übernehmen'
       external_references: 'Externe Referenzen'
       external_all: 'extern (alle)'
+      additional_medium: 'zusätzliches Medium'
       info:
         start_time: >
           Hier kannst Du die Zeit eingeben, an der die
@@ -1311,6 +1314,8 @@ de:
         media: >
           Hier wird Dir angezeigt, in welchen Medienformen
           der zu referenzierende Eintrag vorliegt.
+        additional_medium:
+          Der Eintrag ist mit zusätzlichen Medien verknüpft.
         explanation: >
           Hier kannst Du den zu referenzierenden Eintrag noch
           mit einer (optionalen) zusätzlichen Beschreibung versehen.
@@ -1786,6 +1791,7 @@ de:
   manuscript:
     manuscript: 'Manuskript'
     view: 'pdf im Browser betrachten'
+    view_script: 'Skript im Browser betrachten'
     download: 'Manuskript herunterladen'
     length: 'Länge'
     size: 'Größe'
@@ -2048,6 +2054,8 @@ de:
     interested_html:
       Neugierig geworden? Auf unserem %{blog} und auf %{researchgate} findest du weitere Informationen über
       und Neuigkeiten zu MaMpf. %{guided_tour} findest Du eine geführte Tour durch MaMpf.
+      Außerdem gelangst Du auf diesem %{resources} zu Ressourcen für EditorInnen (z.B. zum MaMpf-LaTeX-Paket).
+    resources: Weg
     blog: Blog
     researchgate: Researchgate
   math:
@@ -2382,6 +2390,7 @@ de:
     interpret: 'Interpretieren'
     import_media: 'Medien importieren'
     view: 'Ansehen'
+    import_script_items: 'Inhaltsverzeichnis aus Skript übernehmen'
   warnings:
     save_before: >
       Du musst zunächst die anderen Änderungen speichern oder verwerfen.

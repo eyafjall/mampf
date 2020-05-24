@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_14_170119) do
+ActiveRecord::Schema.define(version: 2020_05_21_152416) do
 
   create_table "announcements", force: :cascade do |t|
     t.integer "lecture_id"
@@ -203,6 +203,13 @@ ActiveRecord::Schema.define(version: 2020_04_14_170119) do
     t.index ["teachable_type", "teachable_id"], name: "index_imports_on_teachable_type_and_teachable_id"
   end
 
+  create_table "item_self_joins", force: :cascade do |t|
+    t.integer "item_id", null: false
+    t.integer "related_item_id", null: false
+    t.index ["item_id"], name: "index_item_self_joins_on_item_id"
+    t.index ["related_item_id"], name: "index_item_self_joins_on_related_item_id"
+  end
+
   create_table "items", force: :cascade do |t|
     t.text "start_time"
     t.text "sort"
@@ -323,6 +330,7 @@ ActiveRecord::Schema.define(version: 2020_04_14_170119) do
     t.text "content"
     t.text "geogebra_data"
     t.text "geogebra_app_name"
+    t.integer "position"
     t.index ["quizzable_type", "quizzable_id"], name: "index_media_on_quizzable_type_and_quizzable_id"
     t.index ["teachable_type", "teachable_id"], name: "index_media_on_teachable_type_and_teachable_id"
   end
@@ -409,6 +417,7 @@ ActiveRecord::Schema.define(version: 2020_04_14_170119) do
     t.integer "tag_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "tag_position"
     t.index ["section_id"], name: "index_section_tag_joins_on_section_id"
     t.index ["tag_id"], name: "index_section_tag_joins_on_tag_id"
   end
@@ -731,14 +740,18 @@ ActiveRecord::Schema.define(version: 2020_04_14_170119) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
+  create_table "vtt_containers", force: :cascade do |t|
+    t.text "table_of_contents_data"
+    t.text "references_data"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   add_foreign_key "announcements", "lectures"
   add_foreign_key "announcements", "users", column: "announcer_id"
   add_foreign_key "commontator_comments", "commontator_comments", column: "parent_id", on_update: :restrict, on_delete: :cascade
   add_foreign_key "commontator_comments", "commontator_threads", column: "thread_id", on_update: :cascade, on_delete: :cascade
   add_foreign_key "commontator_subscriptions", "commontator_threads", column: "thread_id", on_update: :cascade, on_delete: :cascade
-  add_foreign_key "course_self_joins", "courses"
-  add_foreign_key "division_course_joins", "courses"
-  add_foreign_key "division_course_joins", "divisions"
   add_foreign_key "divisions", "programs"
   add_foreign_key "imports", "media"
   add_foreign_key "items", "media"

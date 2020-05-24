@@ -86,13 +86,6 @@ class Section < ApplicationRecord
     media.select { |m| m.visible_for_user?(user) }
   end
 
-  # reorders the tags as given by the order in tags_order
-  # returns an array
-  def ordered_tags
-    return tags.to_a unless tag_ids.sort == tags_order.sort
-    tags.index_by(&:id).values_at(*tags_order)
-  end
-
   def visible_for_user?(user)
     return true if user.admin
     return true if lecture.edited_by?(user)

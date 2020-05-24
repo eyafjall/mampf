@@ -210,8 +210,7 @@ class MediaController < ApplicationController
       return
     end
     I18n.locale = @medium.locale_with_inheritance
-    @toc = @medium.toc_to_vtt.remove(Rails.root.join('public').to_s)
-    @ref = @medium.references_to_vtt.remove(Rails.root.join('public').to_s)
+    @vtt_container = @medium.create_vtt_container!
     @time = params[:time]
     render layout: 'thyme'
   end
@@ -248,6 +247,10 @@ class MediaController < ApplicationController
     @time = params[:time].to_f
     @item = Item.new(medium: @medium,
                      start_time: TimeStamp.new(total_seconds: @time))
+    if @medium.sort == 'Kaviar' &&
+        @medium.teachable_type.in?(['Lesson', 'Lecture'])
+      @item.section = @medium.teachable&.sections&.first
+    end
   end
 
   # add a reference for the video
@@ -291,9 +294,18 @@ class MediaController < ApplicationController
     render layout: 'enrich'
   end
 
+  # if the medium is associated to a lesson of a lecture which is in script mode
+  # and the lesson has associated script-items, it is possible to import these
+  # items into the toc of the medium
+  def import_script_items
+    @medium.import_script_items!
+  end
+
   # export the video's toc data to a .vtt file
   def export_toc
-    file = @medium.toc_to_vtt
+    @vtt_container = @medium.create_vtt_container!
+    file = Tempfile.new
+    @vtt_container.table_of_contents.stream(file.path)
     cookies['fileDownload'] = 'true'
 
     send_file file,
@@ -304,7 +316,9 @@ class MediaController < ApplicationController
 
   # export the video's references to a .vtt file
   def export_references
-    file = @medium.references_to_vtt
+    @vtt_container = @medium.create_vtt_container!
+    file = Tempfile.new
+    @vtt_container.references.stream(file.path)
     cookies['fileDownload'] = 'true'
 
     send_file file,
@@ -316,8 +330,7 @@ class MediaController < ApplicationController
   # export the video's screenshot to a .vtt file
   def export_screenshot
     return if @medium.screenshot.nil?
-    path = Rails.root.join('public', 'tmp')
-    file = Tempfile.new(['screenshot', '.png'], path)
+    file = Tempfile.new
     @medium.screenshot.stream(file.path)
     cookies['fileDownload'] = 'true'
 
@@ -575,8 +588,6 @@ class MediaController < ApplicationController
       if @medium.teachable.sections.count == 1
         section = @medium.teachable.sections.first
         section.tags << @tags_without_section
-        section.update(tags_order: section.tags_order +
-                                     @tags_without_section.map(&:id))
       end
     end
   end

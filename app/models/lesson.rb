@@ -15,7 +15,8 @@ class Lesson < ApplicationRecord
            after_add: :touch_section
 
   # being a teachable (course/lecture/lesson), a lesson has associated media
-  has_many :media, as: :teachable
+  has_many :media, -> { order(position: :asc) },
+           as: :teachable
 
   validates :date, presence: true
   validates :sections, presence: true
@@ -171,7 +172,7 @@ class Lesson < ApplicationRecord
   end
 
   def section_tags
-    sections.collect(&:ordered_tags).flatten
+    sections.collect(&:tags).flatten
   end
 
   def complement_of_section_tags

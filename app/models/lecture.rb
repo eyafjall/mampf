@@ -19,7 +19,7 @@ class Lecture < ApplicationRecord
                      after_remove: :touch_siblings
 
   # being a teachable (course/lecture/lesson), a lecture has associated media
-  has_many :media, as: :teachable
+  has_many :media, -> { order(position: :asc) }, as: :teachable
 
   # in a lecture, you can import other media
   has_many :imports, as: :teachable, dependent: :destroy
@@ -59,6 +59,10 @@ class Lecture < ApplicationRecord
   after_save :touch_lessons
   after_save :touch_chapters
   after_save :touch_sections
+
+  # if the lecture is destroyed, its forum (if existent) should be destroyed
+  # as well
+  before_destroy :destroy_forum
 
   # scopes for published lectures
   scope :published, -> { where.not(released: nil) }
@@ -467,7 +471,8 @@ class Lecture < ApplicationRecord
                                             Lesson.where(lecture: self))
     lecture_results + lesson_results.includes(:teachable)
                                     .sort_by { |m| [m.lesson.date,
-                                                    m.lesson.id] }
+                                                    m.lesson.id,
+                                                    m.position] }
   end
 
   def begin_date
@@ -610,5 +615,10 @@ class Lecture < ApplicationRecord
 
   def touch_sections
     Section.where(chapter: chapters).update_all(updated_at: Time.now)
+  end
+
+  def destroy_forum
+    return unless forum
+    forum.destroy
   end
 end
