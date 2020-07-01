@@ -172,8 +172,11 @@ class User < ApplicationRecord
 
   # returns the array of those notifications of the user that are announcements
   # in the given lecture
-  def active_announcements(lecture)
+  def active_notifications(lecture)
     notifications.where(notifiable: lecture.announcements)
+                 .includes(notifiable: :announcer)
+                 .sort_by { |n| n.notifiable.created_at }
+                 .reverse
   end
 
   # returns the array of those notifications that are related to MaMpf news
@@ -186,7 +189,7 @@ class User < ApplicationRecord
   # returns the unique user notification that corresponds to the given
   # announcement
   def matching_notification(announcement)
-    notifications.find { |n| n.notifiable == announcement }
+    notifications.find_by(notifiable: announcement)
   end
 
   # a user is a teacher iff he/she has given any lecture
@@ -255,7 +258,7 @@ class User < ApplicationRecord
   # lectures as module editor are all lectures that belong to an edited course
   # but are neither edited lectures nor given lectures
   def lectures_as_module_editor
-    edited_courses.map(&:lectures).flatten - edited_lectures.to_a -
+    Lecture.where(course: edited_courses) - edited_lectures.to_a -
       given_lectures.to_a
   end
 
@@ -379,6 +382,30 @@ class User < ApplicationRecord
                                     .comments.sort_by(&:created_at)
                                     .last } }
       .sort_by { |x| x[:latest_comment].created_at }.reverse
+  end
+
+  # lecture that are in the acive term
+  def active_lectures
+    lectures.where(term: Term.active).includes(:course, :term)
+  end
+
+  def inactive_lectures
+    lectures.where.not(term: Term.active)
+  end
+
+  def courses_without_lectures
+    Course.where(id: CourseUserJoin.where(user: self,
+                                          course: courses,
+                                          primary_lecture_id: nil)
+                                   .pluck(:course_id))
+  end
+
+  def nonsubscribed_lectures
+    Lecture.where.not(id: lectures.pluck(:id))
+  end
+
+  def anonymized_id
+    Digest::SHA2.hexdigest(id.to_s + created_at.to_s).first(20)
   end
 
   private

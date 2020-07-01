@@ -58,6 +58,8 @@ class LecturesController < ApplicationController
                                                         chapter: [:lecture],
                                                         tags: [:notions, :lessons]]])
                         .find_by_id(params[:id])
+      @notifications = current_user.active_notifications(@lecture)
+      @new_topics_count = @lecture.unread_forum_topics_count(current_user) || 0
       render layout: 'application'
     end
   end
@@ -149,6 +151,8 @@ class LecturesController < ApplicationController
   # show all announcements for this lecture
   def show_announcements
     @announcements = @lecture.announcements.order(:created_at).reverse
+    @active_notification_count = current_user.active_notifications(@lecture)
+                                             .size
     I18n.locale = @lecture.locale_with_inheritance
     render layout: 'application'
   end
@@ -203,6 +207,16 @@ class LecturesController < ApplicationController
     render layout: 'application'
   end
 
+  def close_comments
+    @lecture.close_comments!(current_user)
+    redirect_to edit_lecture_path(@lecture)
+  end
+
+  def open_comments
+    @lecture.open_comments!(current_user)
+    redirect_to edit_lecture_path(@lecture)
+  end
+
   private
 
   def set_lecture
@@ -226,11 +240,16 @@ class LecturesController < ApplicationController
                                     :start_section, :organizational, :locale,
                                     :organizational_concept, :muesli,
                                     :content_mode, :passphrase, :sort,
+                                    :comments_disabled,
                                     editor_ids: [])
   end
 
   def structure_params
     params.require(:lecture).permit(structures: {})[:structures]
+  end
+
+  def comment_params
+    params.require(:lecture).permit(:close_comments)
   end
 
   # create notifications to all users about creation of new lecture

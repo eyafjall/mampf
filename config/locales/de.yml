@@ -61,6 +61,7 @@ de:
       short: 'DB'
     muesli: 'MÜSLI'
     board: 'Forum'
+    comments: 'Kommentare'
     organizational: 'Organisatorisches'
     announcements: 'Mitteilungen'
     reste:
@@ -148,6 +149,7 @@ de:
       news: 'News'
       boards: 'Foren'
       stats: 'Zugriffsstatistik'
+      export_stats: 'Statistiken exportieren'
       users: 'Nutzerverwaltung'
       course: 'Modul'
       profile: 'Mein Profil'
@@ -331,7 +333,10 @@ de:
         unveröffentlichte verknüpfte Medien weiterhin unveröffentlicht
         bleiben.
       import_media: 'Medien importieren'
+      close_comments: 'Kommentare für alle zugehörigen Medien deaktivieren'
       no_imported_media: 'Es sind keine importierten Medien vorhanden.'
+      comments_disabled: >
+        Kommentare für neu veröffentlichte Medien sind standardmäßig deaktiviert
       info:
         course: >
           Hier kannst Du das Modul auswählen, zu dem diese
@@ -500,6 +505,13 @@ de:
           gestellt sind. Die Zugriffsrechte werden hierbei zur Laufzeit ermittelt, d.h. das Medium wird
           sichtbar, sobald die Zugriffsrechte auf einen der beiden für importierte Medien zulässigen Werte
           geändert werden.
+        close_comments: >
+          Wenn du dieses Feld aktivierst, werden alle Diskussionen zu Medien,
+          die zu dieser Veranstaltung oder ihren Sitzungen gehören, geschlossen.
+        comments_disabled: >
+          Standardmäßig sind Kommentare für neu veröffentlichte Medien erlaubt,
+          Du kannst bei der Veröffentlichung aber Kommentare deaktivieren.
+          Hier kannst Du dises Verhaltenb umdrehen.
       show_media: 'Medien einblenden'
       workflow: 'Workflow'
       content_mode: 'Inhaltsermittlung'
@@ -941,7 +953,7 @@ de:
           Tags, die Du diesem Medium hinzufügst, werden auch der Sitzung
           hinzugefügt.
         content: >
-          Hier hast Du die Mögflichkeit, eine Inhaltsangabe machen. Du kannst LaTEX benutzen
+          Hier hast Du die Möglichkeit, eine Inhaltsangabe machen. Du kannst LaTEX benutzen
           (indem du den Ausdruck in $...$ setzt). Eine Vorschau Deines Textes
           siehst Du unten.
         linked_media: >
@@ -1064,7 +1076,7 @@ de:
         extracted_content: >
           Hier steht der Inhalt, der aus den assoziierten Dokumenten
           extrahiert wurde (z.B. aus Inhaltsverzeichnissen von Videos,
-          die mit dem THymE-Editor bearebitet wurden).
+          die mit dem THymE-Editor bearbeitet wurden).
         details_warning: >
           Es wurden Details geändert, die noch nicht übernommen wurden.
     tag:
@@ -1132,6 +1144,7 @@ de:
           dann eine Verknüpfung mit diesen Tags.
     term:
       index: 'Semesterübersicht'
+      active_term: 'aktuelles Semester'
     item:
       safe_delete_from_quarantine: >
         Der Eintrag wird von nirgendwo referenziert. Du kannst ihn also
@@ -1506,7 +1519,20 @@ de:
       edit: 'Bemerkung bearbeiten'
       initial_text: 'Dummytext'
       copy_marker: '-KOPIE-'
+      text_input: Texteingabefeld aktiv
+      input: 'Eingabe'
+      preview: 'Vorschau'
+      documents: 'Zu dieser Erläuterung gibt es die folgenden Dokumente:'
       info:
+        preview: >
+          <i>
+          Hinweis.
+          </i>
+          Du kannst LaTeX benutzen, indem Du den LaTeX-Code
+          zwischen Dollarzeichen schreibst (bzw. doppelte Dollarzeichen für
+          abgesetzte Inhalte). Eine Liste der unterstützten Symbole gibt es
+          <a href="https://katex.org/docs/supported.html" target="_blank">
+          hier</a>.
         about: >
           Eine Bemerkung korrespondiert zu einem Passus im Quiz,
           in dem man der NutzerIn Dinge erklärt, Sachverhalte einordnet oder
@@ -1542,6 +1568,8 @@ de:
       video_info: 'Erklärvideo im THymE-Player'
       manuscript: 'Manuskript'
       manuscript_info: 'Manuskript als pdf'
+      geogebra: 'Geogebra-Applet'
+      geogebra_info: 'Geogebra-Applet in neuem Tab'
       medium_for_remark_html: >
         Es gibt ein %{medium} zu dieser Erläuterung.
       media_for_remark_html: >
@@ -1646,6 +1674,11 @@ de:
       name: 'Bezeichnung'
       new: 'Teilbereich anlegen'
       no_courses: 'In diesem Teilbereich gibt es noch keine Module.'
+    interaction:
+      export_interactions: Interaktionen exportieren
+      export_probes: Quizdaten exportieren
+      start: Startdatum
+      end: Enddatum
   profile:
     account: 'Account'
     name: 'Anzeigename'
@@ -2391,6 +2424,8 @@ de:
     import_media: 'Medien importieren'
     view: 'Ansehen'
     import_script_items: 'Inhaltsverzeichnis aus Skript übernehmen'
+    close_comments: 'Diskussionen für alle Medien schließen'
+    open_comments: 'Geschlossene Diskussionen alle wieder öffnen'
   warnings:
     save_before: >
       Du musst zunächst die anderen Änderungen speichern oder verwerfen.
@@ -2427,6 +2462,10 @@ de:
       Bist Du sicher? Die dazugehörigen Sitzungen werden nicht gelöscht,
       sondern werden - bis Du eine andere Abschnittszuordnung vornimmst -
       als "verwaist" geführt.
+    active_term: >
+      Bist Du sicher? Damit wird sich für alle NutzerInnen die Startseite
+      ändern, da die aktuellen Vorlesungen über das aktuelle Semester bestimmt
+      werden.
   privacy_html: >
     Wir nehmen den Umgang mit Deinen Daten ernst. Im Rahmen der
     Datenschutz-Grundverordnung (DSGVO) benötigen wir Deine Zustimmung zur
@@ -2614,6 +2653,8 @@ de:
               invalid: 'Die Angaben sind ungültig.'
         term:
           attributes:
+            active:
+              taken: 'Es kann nur ein aktives Semester geben.'
             season:
               inclusion: 'Ungültiger Typ.'
               taken: 'Dieses Semester existiert bereits.'

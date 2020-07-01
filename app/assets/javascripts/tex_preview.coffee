@@ -40,9 +40,19 @@ $(document).on 'turbolinks:load', ->
 
 
   $(document).on 'keyup', '.commentForm', ->
-    content = $(this).val()
+    content = sanitizeHtml($(this).val(),
+      allowedTags: [
+        'b',
+        'em'
+        'strong'
+        'i'
+        'br'
+        'p'
+        'code'
+        'pre'
+      ])
     preview = '#' + this.id + '-preview'
-    $(preview).text(content)
+    $(preview).html(content)
     # run katex on preview
     previewBox = document.getElementById(this.id + '-preview')
     renderMathInElement previewBox,

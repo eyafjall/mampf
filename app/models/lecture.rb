@@ -14,7 +14,8 @@ class Lecture < ApplicationRecord
   has_many :chapters, -> { order(position: :asc) }, dependent: :destroy
 
   # during the term, a lot of lessons take place for this lecture
-  has_many :lessons, dependent: :destroy,
+  has_many :lessons, -> { order(date: :asc, id: :asc) },
+                     dependent: :destroy,
                      after_add: :touch_siblings,
                      after_remove: :touch_siblings
 
@@ -191,11 +192,15 @@ class Lecture < ApplicationRecord
   #   and items in quarantine
   def script_items_by_position
     return [] unless manuscript
+    hidden_chapters = Chapter.where(hidden: true)
+    hidden_sections = Section.where(hidden: true)
+                             .or(Section.where(chapter: hidden_chapters))
     Item.where(medium: lecture.manuscript)
         .where.not(sort: 'self')
         .content
         .unquarantined
         .unhidden
+        .where.not(section: hidden_sections)
         .order(:position)
   end
 
@@ -516,12 +521,6 @@ class Lecture < ApplicationRecord
          .lecture_path(self)
   end
 
-  def active_announcements(user)
-    announcements.includes(:announcer)
-                .where(id: user.notifications.where(notifiable: announcements)
-                .pluck(:notifiable_id))
-  end
-
   def self.sorts
     ['lecture', 'seminar', 'proseminar', 'oberseminar']
   end
@@ -538,6 +537,25 @@ class Lecture < ApplicationRecord
   def chapter_name
     return 'chapter' unless seminar?
     'talk'
+  end
+
+  def comments_closed?
+    media_with_inheritance.map(&:commontator_thread).map(&:is_closed?).all?
+  end
+
+  def close_comments!(user)
+    media_with_inheritance.each do |m|
+      m.commontator_thread.close(user)
+    end
+  end
+
+  def open_comments!(user)
+    media_with_inheritance.select { |m| m.commontator_thread.is_closed?}
+                          .each { |m| m.commontator_thread.reopen }
+  end
+
+  def self.in_current_term
+    Lecture.where(term: Term.active)
   end
 
   private

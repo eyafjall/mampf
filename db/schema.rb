@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_21_152416) do
+ActiveRecord::Schema.define(version: 2020_06_13_090342) do
 
   create_table "announcements", force: :cascade do |t|
     t.integer "lecture_id"
@@ -258,6 +258,7 @@ ActiveRecord::Schema.define(version: 2020_05_21_152416) do
     t.text "sort"
     t.integer "forum_id"
     t.text "structure_ids"
+    t.boolean "comments_disabled"
     t.index ["teacher_id"], name: "index_lectures_on_teacher_id"
     t.index ["term_id"], name: "index_lectures_on_term_id"
   end
@@ -331,6 +332,7 @@ ActiveRecord::Schema.define(version: 2020_05_21_152416) do
     t.text "geogebra_data"
     t.text "geogebra_app_name"
     t.integer "position"
+    t.boolean "text_input", default: false
     t.index ["quizzable_type", "quizzable_id"], name: "index_media_on_quizzable_type_and_quizzable_id"
     t.index ["teachable_type", "teachable_id"], name: "index_media_on_teachable_type_and_teachable_id"
   end
@@ -461,6 +463,7 @@ ActiveRecord::Schema.define(version: 2020_05_21_152416) do
     t.string "season"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: false
   end
 
   create_table "thredded_categories", force: :cascade do |t|
@@ -719,6 +722,7 @@ ActiveRecord::Schema.define(version: 2020_05_21_152416) do
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
     t.boolean "unread_comments", default: false
+    t.boolean "study_participant", default: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

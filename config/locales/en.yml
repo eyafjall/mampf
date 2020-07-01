@@ -77,6 +77,7 @@ en:
       short: 'Exa'
     muesli: 'MUESLI'
     board: 'Board'
+    comments: 'Comments'
     organizational: 'General Information'
     announcements: 'Announcements'
     reste:
@@ -156,6 +157,7 @@ en:
       news: 'News'
       boards: 'Messageboards'
       stats: 'Access statistics'
+      export_stats: 'Export statistics'
       users: 'User administration'
       course: 'Course'
       profile: 'My Profile'
@@ -322,6 +324,9 @@ en:
         leave all related media unpublished.
       import_media: 'Import Media'
       no_imported_media: 'There are no imported media.'
+      close_comments: 'Close all threads for related media'
+      comments_disabled: >
+        Comments for newly published media are disabled by default
       info:
         course: >
           Here you can select the course to which this event series belongs.
@@ -470,6 +475,12 @@ en:
           are neither "free" nor "only registered MaMpf users". The access rights are checked at runtime,
           so the medium will become visible when the access rights are changed to one of the two admissible
           values for imported media.
+        close_comments: >
+          If you activate this switch, all threads related to media that belong
+          to this event series or its' lessons will be closed.
+        comments_disabled: >
+          By default, comments for newly published media are enabled, and you
+          can disable them upon publishing. Here you can reverse this.
       show_media: 'Show media'
       workflow: 'Workflow'
       content_mode: 'Content determination'
@@ -1058,6 +1069,7 @@ en:
           tags.
     term:
       index: 'Term Index'
+      active_term: 'Current Term'
     quiz:
       graph: 'Quiz Graph'
       create_graph: 'Create Quiz Graph'
@@ -1408,7 +1420,20 @@ en:
       edit: 'Edit Remark'
       initial_text: 'Initial text'
       copy_marker: '-COPY-'
+      text_input: Text Input active
+      input: 'Input'
+      preview: 'Preview'
+      documents: 'For this remark there are the following documents:'
       info:
+        preview: >
+          <i>
+          Note.
+          </i>
+          You can use LaTeX in your posts by writing the LaTeX code between
+          dollar signs (or double dollar signs).
+          A list of supported symbols can be found
+          <a href="https://katex.org/docs/supported.html" target="_blank">
+          here</a>.
         about: >
           A remark corresponds to a passage in a quiz in which you explain
           material to the user, often as a link between successive questions.
@@ -1441,6 +1466,8 @@ en:
       video_info: 'Explanation Video in THymEPlayer'
       manuscript: 'Manuscript'
       manuscript_info: 'Manuskript as pdf'
+      geogebra: 'Geogebra Applet'
+      geogebra_info: 'Geogebra Applet in new tab'
       medium_for_remark_html: >
         There is a %{medium} for this remark.
       media_for_remark_html: >
@@ -1540,6 +1567,11 @@ en:
       name: 'Title'
       new: 'Create new division'
       no_courses: 'There are no courses in this division yet.'
+    interaction:
+      export_interactions: Export Interactions
+      export_probes: Export Probes
+      start: Start Date
+      end: End Date
   profile:
     account: 'Account'
     name: 'Display name'
@@ -2264,6 +2296,8 @@ en:
     import_media: 'Import Media'
     view: 'View'
     import_script_items: 'Import table of contents from manuscript'
+    close_comments: 'Close discussions for all related media'
+    open_comments: 'Reopen all closed discussions'
   confirmation:
     generic: 'Are you sure?'
     delete_graph: >
@@ -2295,6 +2329,10 @@ en:
       Are you sure? The associated sessions will not be deleted, but they will
       be - until you assign them to a different section - considered
       as "orphaned".
+    active_term: >
+      Are you sure? This will in particular mean that the starting page for all
+      users will be different as the current lectures are computed from the
+      current term.
   privacy_html: >
     We care about handling your data responsibly. By
     GDPR, we need your consent for storing and processing
@@ -2480,6 +2518,8 @@ en:
               invalid: 'The input is invalid.'
         term:
           attributes:
+            active:
+              taken: 'There can be only one active term.'
             season:
               inclusion: 'Not a valid type.'
               taken: 'This term already exists.'

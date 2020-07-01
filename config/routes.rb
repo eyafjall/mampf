@@ -98,6 +98,9 @@ Rails.application.routes.draw do
   get 'events/render_import_media', as: 'render_import_media'
   get 'events/cancel_import_media', as: 'cancel_import_media'
 
+  get 'interactions/export_interactions', as: 'export_interactions'
+  get 'interactions/export_probes', as: 'export_probes'
+
   resources :interactions, only: [:index]
 
   get 'items/:id/display', to: 'items#display',
@@ -139,6 +142,10 @@ Rails.application.routes.draw do
   delete 'lectures/:id/remove_imported_medium',
          to: 'lectures#remove_imported_medium',
          as: 'lecture_remove_imported_medium'
+  get 'lectures/:id/close_comments', to: 'lectures#close_comments',
+                                     as: 'lecture_close_comments'
+  get 'lectures/:id/open_comments', to: 'lectures#open_comments',
+                                     as: 'lecture_open_comments'
 
   resources :lectures, except: [:index]
 
@@ -286,6 +293,8 @@ Rails.application.routes.draw do
 
   get 'terms/cancel_term_edit', to: 'terms#cancel',
                                 as: 'cancel_term_edit'
+  post 'terms/set_active_term', to: 'terms#set_active',
+                                as: 'set_active_term'
   resources :terms, except: [:show]
 
   devise_for :users, controllers: { confirmations: 'confirmations',
@@ -330,6 +339,8 @@ Rails.application.routes.draw do
                        as: 'comments'
   get 'main/sponsors', to: 'main#sponsors',
                        as: 'sponsors'
+  get 'main/start', to: 'main#start',
+                    as: 'start'
 
   mount ScreenshotUploader.upload_endpoint(:cache) => "/screenshots/upload"
   mount VideoUploader.upload_endpoint(:cache) => "/videos/upload"
