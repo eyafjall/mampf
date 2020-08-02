@@ -3,6 +3,7 @@ class MainController < ApplicationController
   skip_before_action :authenticate_user!, only: [:home, :about, :news,
                                                  :sponsors]
   before_action :check_for_consent
+  authorize_resource class: false, only: :start
 
   def home
     if user_signed_in?
@@ -41,9 +42,9 @@ class MainController < ApplicationController
                        current_user.courses_without_lectures
     @inactive_lectures = current_user.inactive_lectures.includes(:course, :term)
                                      .sort_by(&:begin_date).reverse
-    @other_current_lectures = Lecture.in_current_term.includes(:course, :term) -
+    @other_current_lectures = Lecture.published.in_current_term.includes(:course, :term) -
                                 current_user.active_lectures
-    @nonsubscribed_lectures = current_user.nonsubscribed_lectures
+    @nonsubscribed_lectures = current_user.nonsubscribed_lectures.published
                                           .where.not(term: Term.active)
                                           .includes(:term, :course)
                                           .sort_by(&:begin_date).reverse

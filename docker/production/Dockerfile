@@ -20,4 +20,3 @@ COPY --chown=app:app ./Gemfile /usr/src/app
 COPY --chown=app:app ./Gemfile.lock /usr/src/app
 RUN bundle install
 COPY --chown=app:app ./ /usr/src/app
-
