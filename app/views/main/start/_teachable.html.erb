@@ -1,56 +1,58 @@
 <div class="col mb-4">
 	<div class="card h-100 bg-mdb-color-lighten-7">
 		<div class="card-header bg-mdb-color-lighten-1 text-light">
-      <% if current %>
-        <%= link_to teachable.title_no_term,
-                    teachable,
-                    class: 'text-light' %>
-      <% else %>
-        <%= link_to teachable.title_no_term,
-                   teachable,
-                   class: 'text-light' %>
-        <% if teachable.is_a?(Lecture) %>
-          <br>
-          <%= teachable.term.to_label_short %>
-        <% end %>
-      <% end %>
-      <div>
-        <% if teachable.is_a?(Lecture) %>
-          <%= teachable.teacher.name %>
-        <% else %>
-          (Modul)
-        <% end %>
+      <div class="row">
+        <div class="col-10 font-weight-bold">
+          <% if subscribed %>
+            <%= link_to teachable.title_no_term,
+                        teachable,
+                        class: 'text-light' %>
+          <% else %>
+            <%= teachable.title_no_term %>
+          <% end %>
+        </div>
+        <div class="col-2 text-right">
+          <% if subscribed %>
+            <%= link_to '',
+                        '',
+                        class: 'far fa-minus-square text-light no-decoration',
+                        data: { toggle: 'tooltip',
+                                placement: 'bottom' },
+                        title: t('basics.unsubscribe') %>
+          <% else %>
+            <%= link_to '',
+                        '',
+                        class: 'far fa-plus-square text-light no-decoration',
+                        data: { toggle: 'tooltip',
+                                placement: 'bottom' },
+                        title: t('basics.subscribe') %>
+          <% end %>
+        </div>
       </div>
-		</div>
-    <%= link_to image_tag('/thyme.png',
-                          class: 'card-img-top',
-                          alt: 'Card image cap'),
-                teachable %>
+      <div class="row">
+        <div class="col-12">
+          <% if teachable.is_a?(Lecture) %>
+            <% unless current %>
+              <%= teachable.term.to_label_short %>,
+            <% end %>
+            <%= teachable.teacher.name %>
+          <% else %>
+            (<%= t('categories.course') %>)
+          <% end %>
+        </div>
+		  </div>
+    </div>
+    <% if subscribed %>
+      <%= link_to image_tag('/thyme.png',
+                            class: 'card-img-top',
+                            alt: 'Card image cap'),
+                  teachable %>
+    <% else %>
+      <%= image_tag('/thyme.png',
+                            class: 'card-img-top',
+                            alt: 'Card image cap') %>
+    <% end %>
   	<div class="card-body">
-      <% if subscribed && teachable.is_a?(Lecture) %>
-        <% if current_user.active_notifications(teachable).size.positive? %>
-          <%= current_user.active_notifications(teachable).size %>
-          neue Mitteilung(en)
-          <br>
-        <% end %>
-        <% if current_user.active_media_notifications(teachable).size.positive? %>
-          <%= current_user.active_media_notifications(teachable).size %>
-          neue Medien
-          <br>
-        <% end %>
-        <% if teachable.unread_forum_topics_count(current_user)&.positive? %>
-          <%= teachable.unread_forum_topics_count(current_user) %>
-          neue Forenbeiträge
-        <% end %>
-        <% if current_user.active_notifications(teachable).size.zero? &&
-            current_user.active_media_notifications(teachable).size.zero? &&
-            (teachable.unread_forum_topics_count(current_user) || 0).zero? %>
-          Du bist auf dem neuesten Stand.
-        <% end %>
-      <% end %>
-      <% if subscribed && teachable.is_a?(Course) %>
-        Du bist auf dem neuesten Stand.
-      <% end %>
       <% unless subscribed %>
         <% teachable.course.divisions.each do |d| %>
           <div class="small">
@@ -58,19 +60,37 @@
           </div>
         <% end %>
       <% end %>
-  	</div>
-  	<div class="card-footer">
-    	<small class="text-muted">
-    		<% if subscribed %>
-          <%= link_to 'abbestellen',
-                      '',
-                      class: 'text-dark' %>
-        <% else %>
-          <%= link_to 'abonnieren',
-                      '',
-                      class: 'text-dark' %>
+      <div class="teachable-body">
+        <% if subscribed && teachable.is_a?(Lecture) %>
+          <%= tag.div class: news_color(current_user
+                                          .active_notifications(teachable)
+                                          .size) do %>
+            <%= current_user.active_notifications(teachable).size %>
+            <%= tag.i class: 'far fa-envelope mr-3',
+                      data: { toggle: 'tooltip',
+                              placement: 'bottom' },
+                      title: t('admin.lecture.new_notifications') %>
+          <% end %>
+          <%= tag.div class: news_color(current_user
+                                          .active_media_notifications(teachable)
+                                          .size) do %>
+            <%= current_user.active_media_notifications(teachable).size %>
+            <%= tag.i class: 'far fa-folder mr-3',
+                      data: { toggle: 'tooltip',
+                              placement: 'bottom' },
+                      title: t('admin.lecture.new_media') %>
+          <% end %>
+          <%= tag.div class: news_color(teachable
+                                          .unread_forum_topics_count(current_user)
+                                          .to_i) do %>
+            <%= teachable.unread_forum_topics_count(current_user).to_i %>
+            <%= tag.i class: 'far fa-comment-alt mr-3',
+                      data: { toggle: 'tooltip',
+                              placement: 'bottom' },
+                      title: t('admin.lecture.new_posts') %>
+          <% end %>
         <% end %>
-    	</small>
+      </div>
   	</div>
 	</div>
 </div>
