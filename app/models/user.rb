@@ -10,7 +10,6 @@ class User < ApplicationRecord
 
   # a user has many subscribed courses
   has_many :course_user_joins, dependent: :destroy
-  has_many :courses, -> { distinct }, through: :course_user_joins
 
   # a user has many courses as an editor
   has_many :editable_user_joins, foreign_key: :user_id, dependent: :destroy
@@ -37,9 +36,6 @@ class User < ApplicationRecord
   # a user has many clickers as editor
   has_many :clickers, foreign_key: 'editor_id', dependent: :destroy
 
-  # at least one course must be subscribed (if there are courses)
-  validates :courses, presence: true, if: :courses_exist?
-
   # if a homepage is given it should at leat be a valid address
   validates :homepage, http_url: true, if: :homepage?
 
@@ -60,6 +56,10 @@ class User < ApplicationRecord
   # returns the array of all teachers
   def self.teachers
     User.where(id: Lecture.pluck(:teacher_id).uniq)
+  end
+
+  def self.select_teachers
+    User.teachers.map { |u| [u.name, u.id] }
   end
 
   # returns the array of all editors
@@ -90,6 +90,10 @@ class User < ApplicationRecord
         .map { |u| [ "#{u.first} (#{u.second})", u.third] }
   end
 
+  def courses
+    Course.where(id: lectures.pluck(:course_id).uniq)
+  end
+
   # related courses for user are
   # - all courses that the user has subscribe to plus their preceding courses
   #   (if subscription type is 1)
@@ -110,8 +114,11 @@ class User < ApplicationRecord
   # - all courses if the user is an admin,
   # - all courses edited by the user otherwise
   def select_administrated_courses
-    relevant = admin ? Course.all : edited_courses
-    relevant.map { |c| [c.title, c.id] }
+    administrated_courses.map { |c| [c.title, c.id] }
+  end
+
+  def administrated_courses
+    admin ? Course.all : edited_courses
   end
 
   # related lectures are lectures associated to related courses (see above)
@@ -122,7 +129,8 @@ class User < ApplicationRecord
   # returns ARel of all those tags from the given tags that belong to
   # the user's related lectures
   def filter_tags(tags)
-    Tag.where(id: tags.select { |t| t.in_lectures?(related_lectures) }
+    Tag.where(id: tags.select { |t| t.in_lectures?(related_lectures) ||
+                                      t.in_courses?(related_courses) }
                       .map(&:id))
   end
 
@@ -148,16 +156,12 @@ class User < ApplicationRecord
 
   # array of the user's subscribed lectures sorted by date
   def lectures_by_date
-    lectures.to_a.sort do |i, j|
-      j.term.begin_date <=> i.term.begin_date
-    end
+    lectures.sort
   end
 
   # array of the lectures the user has given as a teacher sorted by date
   def given_lectures_by_date
-    given_lectures.to_a.sort do |i, j|
-      j.term.begin_date <=> i.term.begin_date
-    end
+    given_lectures.sort
   end
 
   # array of all tags related to the users subscribed lectures
@@ -390,7 +394,7 @@ class User < ApplicationRecord
       .sort_by { |x| x[:latest_comment].created_at }.reverse
   end
 
-  # lecture that are in the acive term
+  # lecture that are in the active term
   def active_lectures
     lectures.where(term: Term.active).includes(:course, :term)
   end
@@ -399,19 +403,42 @@ class User < ApplicationRecord
     lectures.where.not(term: Term.active)
   end
 
-  def courses_without_lectures
-    Course.where(id: CourseUserJoin.where(user: self,
-                                          course: courses,
-                                          primary_lecture_id: nil)
-                                   .pluck(:course_id))
-  end
-
   def nonsubscribed_lectures
     Lecture.where.not(id: lectures.pluck(:id))
   end
 
   def anonymized_id
     Digest::SHA2.hexdigest(id.to_s + created_at.to_s).first(20)
+  end
+
+  def subscribe_teachable!(teachable)
+    return false unless teachable.is_a?(Lecture)
+    return false if teachable.in?(lectures)
+    lectures << teachable
+    true
+  end
+
+  def unsubscribe_teachable!(teachable)
+    return false unless teachable.is_a?(Lecture)
+    return false unless teachable.in?(lectures)
+    lectures.delete(teachable)
+    true
+  end
+
+  def current_teachables
+    active_lectures.includes(:course, :term).natural_sort_by(&:title) +
+      lectures.where(term: nil).natural_sort_by(&:title)
+  end
+
+  def current_subscribable_lectures
+    current_lectures = Lecture.in_current_term.includes(:course, :term)
+    no_term_lectures = Lecture.no_term.includes(:course, :term)
+    return current_lectures.sort + no_term_lectures.sort if admin
+    unless editor? || teacher?
+      return current_lectures.published.sort + no_term_lectures.published.sort
+    end
+    current_lectures.select { |l| l.edited_by?(self) || l.published? }.sort +
+      no_term_lectures.select { |l| l.edited_by?(self) || l.published? }.sort
   end
 
   private

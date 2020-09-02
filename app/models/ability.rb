@@ -40,7 +40,7 @@ class Ability
 
       # anyone should be able to get a sidebar and see the announcements
       can [:render_sidebar, :organizational, :show_announcements,
-           :show_structures, :search_examples], Lecture
+           :show_structures, :search_examples, :search], Lecture
 
       can [:display, :show_random_quizzes, :take_random_quiz,
            :render_question_counter], Course
@@ -122,6 +122,7 @@ class Ability
       end
     else
       can :read, :all
+      can :start, :main
       cannot :read, [:administration, Term, User, Announcement]
       cannot :index, Interaction
       # guest users can play/display media only when their release status
@@ -163,7 +164,7 @@ class Ability
       can :teacher, User
       # anyone should be able to get a sidebar and see the announcements
       can [:render_sidebar, :show_announcements, :organizational,
-           :show_structures, :search_examples], Lecture
+           :show_structures, :search_examples, :search], Lecture
       cannot [:show_announcements, :organizational], Lecture do |lecture|
         !lecture.in?(user.lectures)
       end

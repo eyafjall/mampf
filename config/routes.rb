@@ -135,6 +135,8 @@ Rails.application.routes.draw do
                                       as: 'edit_structures'
   get 'lectures/:id/search_examples', to: 'lectures#search_examples',
                                       as: 'search_examples'
+  get 'lectures/search', to: 'lectures#search',
+                         as: 'search_lectures'
   post 'lectures/:id/publish', to: 'lectures#publish',
                               as: 'publish_lecture'
   post 'lectures/:id/import_media', to: 'lectures#import_media',
@@ -219,6 +221,9 @@ Rails.application.routes.draw do
   patch 'profile/add_consent', as: 'add_consent'
   put 'profile/add_consent'
   post 'profile/toggle_thread_subscription', as: 'toggle_thread_subscription'
+  patch 'profile/subscribe_teachable', as: 'subscribe_teachable'
+  patch 'profile/unsubscribe_teachable', as: 'unsubscribe_teachable'
+  get 'profile/show_accordion', as: 'show_accordion'
 
   resources :programs, except: [:show]
 
@@ -298,7 +303,8 @@ Rails.application.routes.draw do
   resources :terms, except: [:show]
 
   devise_for :users, controllers: { confirmations: 'confirmations',
-                                    registrations: 'registrations' }
+                                    registrations: 'registrations',
+                                    sessions: 'sessions' }
 
   get 'users/elevate', to: 'users#elevate',
                        as: 'elevate_user'

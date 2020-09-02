@@ -7,8 +7,9 @@ class Lecture < ApplicationRecord
   # teacher is the user that gives the lecture
   belongs_to :teacher, class_name: 'User', foreign_key: 'teacher_id'
 
-  # a lecture takes place in a certain term
-  belongs_to :term
+  # a lecture takes place in a certain term, except those where the course
+  # is marked as term_independent
+  belongs_to :term, optional: true
 
   # a lecture has many chapters, who have positions
   has_many :chapters, -> { order(position: :asc) }, dependent: :destroy
@@ -50,6 +51,12 @@ class Lecture < ApplicationRecord
 
   validates :content_mode, inclusion: { in: ['video', 'manuscript'] }
 
+  validates_presence_of :term, unless: :term_independent?
+
+  validate :absence_of_term, if: :term_independent?
+
+  validate :only_one_lecture, if: :term_independent?, on: :create
+
   # as a teacher has editing rights by definition, we do not need him in the
   # list of editors
   after_save :remove_teacher_as_editor
@@ -67,6 +74,34 @@ class Lecture < ApplicationRecord
 
   # scopes for published lectures
   scope :published, -> { where.not(released: nil) }
+
+  scope :no_term, -> { where(term: nil) }
+
+  searchable do
+    integer :term_id do
+      term_id || 0
+    end
+    integer :teacher_id
+    string :sort
+    text :text do
+      course.title
+    end
+    integer :program_ids, multiple: true do
+      course.divisions.pluck(:program_id).uniq
+    end
+    integer :editor_ids, multiple: true
+    boolean :is_published do
+      published?
+    end
+    # these two are for ordering
+    time :sort_date do
+      begin_date
+    end
+    string :sort_title do
+      ActiveSupport::Inflector.transliterate(course.title).downcase
+    end
+  end
+
 
   # The next methods coexist for lectures and lessons as well.
   # Therefore, they can be called on any *teachable*
@@ -87,11 +122,17 @@ class Lecture < ApplicationRecord
   end
 
   def title
+    return course.title unless term
     "(#{sort_localized_short}) #{course.title}, #{term.to_label}"
   end
 
   def title_no_term
+    return course.title unless term
     "(#{sort_localized_short}) #{course.title}"
+  end
+
+  def title_term_short
+    "(#{sort_localized_short}) #{term_to_label_short}"
   end
 
   def to_label
@@ -99,6 +140,7 @@ class Lecture < ApplicationRecord
   end
 
   def compact_title
+    return course.compact_title unless term
     "#{sort_localized_short}.#{course.compact_title}.#{term.compact_title}"
   end
 
@@ -287,6 +329,7 @@ class Lecture < ApplicationRecord
   # term, title) in various combinations
 
   def short_title
+    return course.short_title unless term
     "(#{sort_localized_short}) #{course.short_title} #{term.to_label_short}"
   end
 
@@ -296,6 +339,7 @@ class Lecture < ApplicationRecord
   end
 
   def short_title_brackets
+    return course.short_title unless term
     "(#{sort_localized_short}) #{course.short_title} (#{term.to_label_short})"
   end
 
@@ -305,13 +349,15 @@ class Lecture < ApplicationRecord
   end
 
   def title_with_teacher_no_type
+    return "#{course.title}, (#{teacher.name})" unless term
     "#{course.title}, #{term.to_label} (#{teacher.name})"
   end
 
   def term_teacher_info
-    return term.to_label unless teacher.present?
-    return term.to_label unless teacher.name.present?
-    "(#{sort_localized_short}) #{term.to_label}, #{teacher.name}"
+    return term_to_label unless teacher.present?
+    return term_to_label unless teacher.name.present?
+    return "#{course.title}, #{teacher.name}" unless term
+    "(#{sort_localized_short}) #{term_to_label}, #{teacher.name}"
   end
 
   def term_teacher_published_info
@@ -320,11 +366,11 @@ class Lecture < ApplicationRecord
   end
 
   def title_term_info
-    "(#{sort_localized_short}) #{course.title}, #{term.to_label}"
+    "(#{sort_localized_short}) #{course.title}, #{term_to_label}"
   end
 
   def title_term_info_no_type
-    "#{course.title}, #{term.to_label}"
+    "#{course.title}, #{term_to_label}"
   end
 
   def title_teacher_info
@@ -418,40 +464,6 @@ class Lecture < ApplicationRecord
     false
   end
 
-  # is it the user's chosen primary lecture among the course's lectures?
-  # returns nil if course is not subscribed
-  def primary?(user)
-    course_join = user.course_user_joins.find { |j| j.course == lecture.course }
-    return if course_join.nil?
-    course_join.primary_lecture_id == id
-  end
-
-  # is it the user's chosen primary lecture among the course's lectures?
-  def checked_as_primary_by?(user)
-    return primary?(user) if course.subscribed_by?(user)
-    false
-  end
-
-  # is it one of the user's chosen secondary lecture among the
-  # course's lectures?
-  def checked_as_secondary_by?(user)
-    return false unless course.subscribed_by?(user)
-    course.subscribed_lectures(user).include?(self)
-  end
-
-  # returns true if
-  # - this lecture coincides with the given preselected lecture, and the
-  #   preselected lecture is subscribed by the user
-  # OR
-  # - this lecture is the user's primary lecture for this course
-  def active?(user, preselected_lecture_id)
-    if course.subscribed_lectures(user).map(&:id)
-             .include?(preselected_lecture_id)
-      return id == preselected_lecture_id
-    end
-    primary?(user)
-  end
-
   # returns path for show action of the lecture's course,
   def path(user)
     return unless user.lectures.include?(self)
@@ -486,7 +498,7 @@ class Lecture < ApplicationRecord
 
   def begin_date
     Rails.cache.fetch("#{cache_key_with_version}/begin_date") do
-      term&.begin_date
+      term&.begin_date || Term.active.begin_date || Date.today
     end
   end
 
@@ -533,8 +545,12 @@ class Lecture < ApplicationRecord
     Lecture.sorts.map { |s| [s, I18n.t("admin.lecture.#{s}")] }.to_h
   end
 
+  def self.select_sorts
+    Lecture.sort_localized.invert.to_a
+  end
+
   def seminar?
-    return true unless sort == 'lecture'
+    return true if sort.in?(['seminar', 'proseminar', 'oberseminar'])
     false
   end
 
@@ -573,6 +589,58 @@ class Lecture < ApplicationRecord
     -1
   end
 
+  def subscribed_by?(user)
+    in?(user.lectures)
+  end
+
+  def self.search_by(search_params, page)
+    search_params[:types] = [] if search_params[:all_types] == '1'
+    search_params[:term_ids] = [] if search_params[:all_terms] == '1'
+    search_params[:teacher_ids] = [] if search_params[:all_teachers] == '1'
+    search_params[:program_ids] = [] if search_params[:all_programs] == '1'
+    search = Sunspot.new_search(Lecture)
+    # add lectures without term to current term
+    if Term.active.id.to_s.in?(search_params[:term_ids])
+      search_params[:term_ids].push('0')
+    end
+    search.build do
+      with(:sort, search_params[:types])
+      with(:teacher_id, search_params[:teacher_ids])
+      with(:program_ids, search_params[:program_ids])
+      with(:term_id, search_params[:term_ids])
+    end
+    admin = User.find_by_id(search_params[:user_id])&.admin
+    unless admin
+      search.build do
+        any_of do
+          with(:is_published, true)
+          with(:teacher_id, search_params[:user_id])
+          with(:editor_ids, search_params[:user_id])
+        end
+      end
+    end
+    if search_params[:fulltext].present?
+      search.build do
+        fulltext search_params[:fulltext]
+      end
+    end
+    search.build do
+      order_by(:sort_date, :desc)
+      order_by(:sort_title, :asc)
+      paginate page: page, per_page: search_params[:per]
+    end
+    search
+  end
+
+  def term_to_label
+    return term.to_label if term
+    ''
+  end
+
+  def term_to_label_short
+    return term.to_label_short if term
+    ''
+  end
 
   private
 
@@ -582,7 +650,7 @@ class Lecture < ApplicationRecord
   end
 
   # looks in the cache if there are any media associated *with inheritance*
-  # to this lecture and a given project (kaviar, semsam etc.)
+  # to this lecture and a given project (kaviar, sesam etc.)
   def project_as_user?(project)
     Rails.cache.fetch("#{cache_key_with_version}/#{project}") do
       Medium.where(sort: medium_sort[project],
@@ -591,12 +659,9 @@ class Lecture < ApplicationRecord
       Medium.where(sort: medium_sort[project],
                    released: ['all', 'users', 'subscribers'],
                    teachable: lessons).exists? ||
-      Medium.includes(:tags)
-            .where(sort: medium_sort[project],
+      Medium.where(sort: medium_sort[project],
                    released: ['all', 'users', 'subscribers'],
-                   teachable: course)
-            .select { |m| (m.tags & tags).any? }
-            .any?
+                   teachable: course).exists?
     end
   end
 
@@ -654,5 +719,19 @@ class Lecture < ApplicationRecord
   def destroy_forum
     return unless forum
     forum.destroy
+  end
+
+  def term_independent?
+    course.term_independent
+  end
+
+  def absence_of_term
+    return unless term
+    errors.add(:term, :present)
+  end
+
+  def only_one_lecture
+    return unless Lecture.where(course: course).any?
+    errors.add(:course, :already_present)
   end
 end

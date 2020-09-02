@@ -26,6 +26,10 @@ class Term < ApplicationRecord
     Term.find_by(active: true)
   end
 
+  def active
+    self == Term.active
+  end
+
   def begin_date
     season == 'SS' ? Date.new(year, 4, 1) : Date.new(year, 10, 1)
   end
@@ -49,8 +53,9 @@ class Term < ApplicationRecord
     season + year_corrected_short
   end
 
-  # array of all terms togther with their ids for use in options_for_select
-  def self.select_terms
+  # array of all terms together with their ids for use in options_for_select
+  def self.select_terms(independent = false)
+    return ['bla', nil] if independent
     Term.all.sort_by(&:begin_date).reverse.map { |t| [t.to_label, t.id] }
   end
 

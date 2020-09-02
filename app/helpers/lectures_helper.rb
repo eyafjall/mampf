@@ -29,7 +29,7 @@ module LecturesHelper
   def lecture_notification_card_text(lecture)
     t('notifications.new_lecture_created_html',
       title: lecture.course.title,
-      term: lecture.term.to_label,
+      term: lecture.term_to_label,
       teacher: lecture.teacher.name)
   end
 
@@ -39,20 +39,6 @@ module LecturesHelper
       profile: link_to(t('notifications.profile'),
                        edit_profile_path,
                        class: 'darkblue'))
-  end
-
-  # add a star to lecture's title if it is a user's primary lecture
-  def starred_title(lecture, user)
-    title = lecture.title_for_viewers
-    return title unless lecture.primary?(user)
-    ('&starf; ' + title).html_safe
-  end
-
-  # add a star to lecture's term if it is a user's primary lecture
-  def starred_term(lecture, user)
-    term = lecture.term.to_label_short
-    return "(#{lecture.sort_localized_short}) #{term}" unless lecture.primary?(user)
-    ('&starf; (' + lecture.sort_localized_short + ') ' + term).html_safe
   end
 
   def days_short
@@ -94,5 +80,25 @@ module LecturesHelper
   def news_color(news_count)
     return '' unless news_count.positive?
     'text-primary'
+  end
+
+  def teachable_header_color(subscribed, lecture)
+    return '' unless subscribed
+    result = 'text-light '
+    result += if lecture.term
+                'bg-mdb-color-lighten-1'
+              else
+                'bg-info'
+              end
+  end
+
+  def circle_icon(subscribed)
+    return 'fas fa-check-circle' if subscribed
+    'far fa-circle'
+  end
+
+  def lecture_border(lecture)
+    return '' if lecture.published?
+    'border-danger'
   end
 end

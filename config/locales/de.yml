@@ -62,7 +62,7 @@ de:
     muesli: 'MÜSLI'
     board: 'Forum'
     comments: 'Kommentare'
-    organizational: 'Organisatorisches'
+    organizational_html: 'Organisa&shy;torisches'
     announcements: 'Mitteilungen'
     reste:
       singular: 'Sonstiges'
@@ -319,6 +319,9 @@ de:
       oberseminar: 'Oberseminar'
       oberseminar_short: 'OS'
       oberseminar_content: 'Oberseminarinhalt'
+      special: 'Special'
+      special_short: ''
+      special_content: 'Inhalt'
       new_lecture: 'Neue Veranstaltung anlegen'
       no_courses_yet: 'Es muss zunächst ein Modul angelegt werden.'
       no_terms_yet: 'Es muss zunächst ein Semester angelegt werden.'
@@ -340,6 +343,8 @@ de:
       new_notifications: 'neue Benachrichtigungen'
       new_media: 'neue Medien'
       new_posts: 'neue Forenbeiträge'
+      no_rights: >
+        Du hast keine Berechtigung, diese Veranstaltung zu abonnieren.
       info:
         course: >
           Hier kannst Du das Modul auswählen, zu dem diese
@@ -515,6 +520,36 @@ de:
           Standardmäßig sind Kommentare für neu veröffentlichte Medien erlaubt,
           Du kannst bei der Veröffentlichung aber Kommentare deaktivieren.
           Hier kannst Du dises Verhaltenb umdrehen.
+        search_type: >
+          Hier musst Du (im Sinne von
+          <i>
+          ODER
+          </i>
+          ) auswählen,
+          was der Typ der Veranstaltung sein soll. Andernfalls wird die Suche ergebnislos sein.
+        search_program: >
+          Hier musst Du (im Sinne von
+          <i>
+          ODER
+          </i>
+          ) auswählen, zu welchen Studiengängen die Veranstaltung gehören soll.
+        search_teacher: >
+          Hier kannst Du (im Sinne von
+          <i>
+          ODER
+          </i>
+          ) auswählen, wer die DozentInnen der Veranstaltung sein sollen.
+        search_term: >
+          Hier kannst Du (im Sinne von
+          <i>
+          ODER
+          </i>
+          ) auswählen, in welchem Semester die Veranstaltungen stattgefunden
+          oder stattfinden.
+        search_fulltext: >
+          Hier kannst Du Text eingeben, nach dem im Titel der Veranstaltung
+          gesucht wird. Wenn Du dieses Feld leer lässt (bzw. weniger als zwei Buchstaben
+          eingibst), wird es bei der Suche ignoriert.
       show_media: 'Medien einblenden'
       workflow: 'Workflow'
       content_mode: 'Inhaltsermittlung'
@@ -584,6 +619,12 @@ de:
       additional_information_visible: 'Weitere Informationen sichtbar'
       programs: 'Studiengänge'
       divisions: 'Teilbereiche'
+      term_independent: 'semesterunabhängig'
+      term_independence: 'Dieses Modul ist semesterunabhängig.'
+      image: 'Bild'
+      no_image: >
+        Es wurde noch kein Bild hochgeladen. Deshalb wird für die
+        Veranstaltungs-Cards das Standard-Bild verwendet.
       info:
         title: >
           Hier musst Du den Titel des Moduls eintragen.
@@ -636,6 +677,16 @@ de:
         programs: >
           Hier kannst Du angeben, zu welchen Studiengängen welcher Fächer
           dieses Modul gehört.
+        term_independent: >
+          Semesterunabhängige Module sind Module, die nicht in das "klassische"
+          Schema passen, in dem Sinne, das semesterabhängig Veranstaltungen
+          dazu angeboten werden. Das kann z.B. Help-Desks oder Lernlandschaften
+          betreffen. Diese Eigenschaft kann nur geändert werden, solange
+          es in diesem Modul noch keine Veranstaltungen gibt.
+        image: >
+          Du kannst ein Bild zu diesem Modul hochladen. Dieses wird für
+          Visualisierungen verwendet, z.B. in den Cards auf der
+          MaMpf-Startseite.
     chapter:
       edit: '%{chapter} bearbeiten'
       position: 'Positionierung nach %{chapter_name}'
@@ -1727,6 +1778,27 @@ de:
     no_consent:
       Du hast der Speicherung und Verarbeitung Deiner Daten nicht zugestimmt.
     locale: 'Sprache'
+    subscribe_lecture: 'Veranstaltung abonnieren'
+    passphrase_required: >
+      Du möchtest die Veranstaltung %{teachable_title} abonnieren. Diese ist
+      durch einen Zugangsschlüssel geschützt. Gib diesen bitte hier ein.
+    my_term_html: Mein Semester &ndash; %{term}
+    inactive_lectures: Weitere abonnierte Veranstaltungen
+    active_nonsubscribed_lectures_html: >
+      Aktuelle Veranstaltungen &ndash; %{term}
+    lecture_search: Veranstaltungssuche
+    no_current_stuff: >
+      Du hast keine Veranstaltungen aus dem aktuellen Semester abonniert.
+    no_inactive_stuff: >
+      Du hast keine Veranstaltungen außerhalb des aktuellen Semesters abonniert.
+    no_current_at_all: >
+      Im aktuellen Semester sind noch keine Veranstaltungen veröffentlicht
+      worden.
+    new_design: >
+      Neues *experimentelles* Design verwenden (personalisierte Startseite, kein Dropdown-Menü
+      für Veranstaltungswahl)
+    other_preferences: >
+      Sonstige Einstellungen
   mampf_news:
     title: 'MaMpf-News'
     check_notifications: 'Alle erledigen'
@@ -1743,6 +1815,7 @@ de:
     new_course_created_html: 'Neues Modul angelegt:<br>%{title}'
     subscribe_course: 'Abonniere es in Deinem Profil.'
     subscribe_course_html: 'Du kannst es über Deine %{profile} abonnieren.'
+    goto_profile: 'Zu deinen Profileinstellungen'
     profile: 'Profileinstellungen'
     mampf_announcement: 'Neue Mitteilung über MaMpf'
     lecture_announcement: 'Neue Mitteilung in %{title}'
@@ -1810,13 +1883,50 @@ de:
     unpublished: 'Dieses Medium ist nicht veröffentlicht.'
     locked: 'Dieses Medium ist gesperrt.'
     imported: 'Dieses Medium wurde importiert.'
+    theme_based: 'thematisch'
+    lecture_only: 'nur Vorlesung'
+    improve_visibility: >
+      Indem du die Sichtbarkeit auf "alle" stellst, kannst du auch Medien
+      anzeigen, die auf der Ebene des Moduls %{course} angesiedelt sind,
+      deren Inhalte in der aktuellen Vorlesung aber noch nicht behandelt wurden.
     waiting_for_tag: >
       Dieses Medium ist auf Modulebene angesiedelt und bezieht sich auf Tags,
       die in der vorliegenden Veranstaltung (noch) nicht behandelt wurden.
       Es ist für AbonnentInnen dieser Veranstaltung deshalb im Augenblick nicht
-      sichtbar. Es wird erst dann sichtbar, wenn mindestens einer der
+      sichtbar in der Sichtbarkeits-Standardeinstellung "thematisch".
+      Es wird in dieser erst dann sichtbar, wenn mindestens einer der
       assoziierten Tags in einem Abschnitt dieser Vorlesung auftaucht oder
       zu einem veröffentlichten Medium auf Veranstaltungsebene assoziiert ist.
+    info:
+      visibility_html: >
+        Hier kannst Du einstellen, welche Medien angezeigt werden sollen.
+        Du hast die folgenden Möglichkeiten:
+        <ul>
+        <li>
+        <i>
+        thematisch:
+        </i>
+        Das ist die Standardeinstellung und auch die empfohlene
+        Einstellung. Du bekommst alle Medien aus der aktuellen Veranstaltun
+        angezeigt. Darüber hinaus werden Medien angezeigt, die zu dem Modul
+        gehören (die also unabhängig davon, wer die Veranstaltung hält, passen
+        sollten), jedoch nur solche, deren Inhalt bereits in der aktuellen
+        Veranstaltung behandelt wurde.
+        </li>
+        <li>
+        <i>
+        nur Vorlesung:
+        </i>
+        Du bekommst alle Medien aus der aktuellen Veranstaltung angezeigt.
+        </li>
+        <li>
+        <i>
+        alle:
+        </i>
+        Du bekommst alle Medien aus der aktuellen Veranstaltung und alle Medien,
+        die zu dem Modul gehören, angezeigt.
+        </li>
+        </ul>
   video:
     video: 'Video'
     play: 'THymE-Player'
@@ -1824,6 +1934,8 @@ de:
     length: 'Länge'
     resolution: 'Auflösung'
     size: 'Größe'
+  image:
+    resolution: 'Abmessungen'
   manuscript:
     manuscript: 'Manuskript'
     view: 'pdf im Browser betrachten'
@@ -2045,8 +2157,13 @@ de:
       Aufgrund deiner %{profile} wurde(n) %{count} Treffer aus der
       Datenbank nicht berücksichtigt.
     settings: 'Profileinstellungen'
-    alternative: 'Meintest Du vielleicht etwas anderes?'
+    alternative: 'Meintest du vielleicht etwas anderes?'
     similar: 'Zum Suchbegriff %{search_string} ähnliche Begriffe'
+    courses_with_similar_titles: >
+      Du könntest es mit folgenden Volltext-Suchbegriffen probieren und die
+      Suche anschließend neu starten:
+    click_and_paste: >
+      Wenn Du den Begriff anklickst, wird er in das Suchfeld "Volltext" kopiert.
   errors:
     profile:
       passphrase: 'Falscher Zugangsschlüssel'
@@ -2147,6 +2264,7 @@ de:
     thread_subscribed: Abo
     who_and_when: vor %{when} von %{who}
     comment_verb: Kommentieren
+    no_comments: Es liegen keine neuen Kommentare vor.
     media_comments: >
       Anzahl der Medien in von den von Dir abonnierten
       Veranstaltungen bzw. Modulen, in denen es neue Kommentare gibt:
@@ -2172,12 +2290,13 @@ de:
     text: 'Text'
     new_lecture_subject: 'Neue Veranstaltung %{title}'
     new_lecture: 'Es wurde eine neue Veranstaltung angelegt: %{title}.'
-    subscribe_lecture_html: 'Du kannst sie über Deine %{profile} abonnieren.'
+    subscribe_lecture: >
+      Du kannst sie über Deine Profileinstellungen abonnieren.
     subscribe_lecture_text: >
       Du kannst sie über Deine Profileinstellungen abonnieren.
     new_course_subject: 'Neues Modul %{title}'
     new_course: 'Es wurde ein neues Modul angelegt: %{title}.'
-    subscribe_course_html: 'Du kannst es über Deine %{profile} abonnieren.'
+    subscribe_course: 'Du kannst es über Deine Profileinstellungen abonnieren.'
     subscribe_course_text: >
       Du kannst es über Deine Profileinstellungen abonnieren.
   statistics:
@@ -2217,6 +2336,7 @@ de:
     courses: 'Module'
     term: 'Semester'
     teacher: 'DozentIn'
+    teachers: 'DozentInnen'
     title: 'Titel'
     short_title: 'Kurztitel'
     editors: 'EditorInnen'
@@ -2347,6 +2467,8 @@ de:
     comments_for: 'Kommentare für %{subject}'
     unsubscribe: 'abbestellen'
     subscribe: 'abonnieren'
+    programs: 'Studiengänge'
+    visibility: 'Sichtbarkeit'
   access:
     unpublished: 'unveröffentlicht'
     all: 'frei'
@@ -2582,10 +2704,16 @@ de:
                 Eine Veranstaltung mit derselben Kombination aus Modul, Semester
                 DozentIn und Typ existiert bereits.
               required: 'Es muss ein Modul angegeben werden.'
+              already_present: >
+                Für Module mit der Eigenschaft 'semesterunabhängig' kann es
+                höchstens eine Veranstaltung geben.
             content_mode:
               inclusion: 'Ungültiger Modus.'
             term:
               required: 'Es muss ein Semester angegeben werden.'
+              present: >
+                Semester angeben, assoziiertes Modul ist jedoch
+                semesterunabhängig
             teacher:
               required: 'Es muss ein(e) DozentIn angegeben werden.'
         link:

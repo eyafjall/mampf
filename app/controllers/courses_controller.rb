@@ -20,7 +20,16 @@ class CoursesController < ApplicationController
 
   def update
     I18n.locale = @course.locale || I18n.default_locale
+    old_image_data = @course.image_data
     @course.update(course_params)
+    @errors = @course.errors
+    return unless @errors.empty?
+    @course.update(image: nil) if params[:course][:detach_image] == 'true'
+    changed_image = @course.image_data != old_image_data
+    if @course.image.present? && changed_image
+      @course.image_derivatives!
+      @course.save
+    end
     @errors = @course.errors
   end
 
@@ -30,8 +39,6 @@ class CoursesController < ApplicationController
     if @course.valid?
       # set organizational_concept to default
       set_organizational_defaults
-      create_notifications
-      send_notification_email
       redirect_to administration_path
       return
     end
@@ -39,31 +46,19 @@ class CoursesController < ApplicationController
   end
 
   def show
-    cookies[:current_course] = @course.id
-    @lecture = @course.primary_lecture(current_user)
     # deactivate http caching for the moment
     # "refused to execute script because its mime type is not executable
     #  error in Chrome"...
-    if stale?(etag: @lecture || @course,
+    if stale?(etag: @course,
               last_modified: [current_user.updated_at, @course.updated_at,
                               Time.parse(ENV['RAILS_CACHE_ID']),
-                              @lecture&.updated_at || current_user.updated_at,
                               Thredded::UserDetail.find_by(user_id: current_user.id)
                                                   &.last_seen_at || current_user.updated_at,
-                              @lecture&.forum&.updated_at || current_user.updated_at,
                               @course&.forum&.updated_at || current_user.updated_at].max)
-      unless @course.in?(current_user.courses) && @lecture
-        cookies[:current_lecture] = nil
-        I18n.locale = @course.locale || I18n.default_locale
-        render layout: 'application'
-        return
-      end
-      cookies[:current_lecture] = @lecture.id
-      I18n.locale = @lecture.locale_with_inheritance || I18n.default_locale
-      @lecture = @course.primary_lecture(current_user, eagerload: true)
-      @notifications = current_user.active_notifications(@lecture)
-      @new_topics_count = @lecture.unread_forum_topics_count(current_user) || 0
-      render template: 'lectures/show', layout: 'application'
+      cookies[:current_lecture] = nil
+      I18n.locale = @course.locale || I18n.default_locale
+      render layout: 'application'
+      return
     end
   end
 
@@ -157,6 +152,7 @@ class CoursesController < ApplicationController
   def course_params
     params.require(:course).permit(:title, :short_title, :organizational,
                                    :organizational_concept, :locale,
+                                   :term_independent, :image,
                                    tag_ids: [],
                                    preceding_course_ids: [],
                                    editor_ids: [],
@@ -170,31 +166,6 @@ class CoursesController < ApplicationController
   def random_quiz_params
     params.require(:quiz).permit(:random_quiz_count,
                                  search_tag_ids: [])
-  end
-
-  # create notifications to all users about creation of new course
-  def create_notifications
-    notifications = []
-    User.find_each do |u|
-      notifications << Notification.new(recipient: u,
-                                        notifiable_id: @course.id,
-                                        notifiable_type: 'Course',
-                                        action: 'create')
-    end
-    Notification.import notifications
-  end
-
-  def send_notification_email
-    recipients = User.where(email_for_teachable: true)
-    I18n.available_locales.each do |l|
-      local_recipients = recipients.where(locale: l)
-      if local_recipients.any?
-        NotificationMailer.with(recipients: local_recipients,
-                                locale: l,
-                                course: @course)
-                          .new_course_email.deliver_now
-      end
-    end
   end
 
   # destroy all notifications related to this course

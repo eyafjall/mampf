@@ -22,10 +22,24 @@ $(document).on 'turbolinks:load', ->
         subscribe: $(this).is(':checked')
       }
 
+  $(document).on 'show.bs.collapse', '.subscriptionsCollapse', ->
+    $($(this).data('link')).removeClass('text-dark')
+    $.ajax Routes.show_accordion_path(),
+      type: 'GET'
+      dataType: 'script'
+      data: {
+        id: this.id
+      }
+     return
+
+  $('.subscriptionsCollapse').on 'hide.bs.collapse', ->
+     $($(this).data('link')).addClass('text-dark')
+     return
 
   return
 
 # clean up everything before turbolinks caches
 $(document).on 'turbolinks:before-cache', ->
   $(document).off 'click', '.subscriptionSwitch'
+  $(document).off 'show.bs.collapse', '.subscriptionsCollapse'
   return

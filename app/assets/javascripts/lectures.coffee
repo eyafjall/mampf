@@ -196,7 +196,7 @@ $(document).on 'turbolinks:load', ->
     $('.tagbadgeshort').show()
     $('.courseMenuItemShort').show()
     $('#secondnav').show()
-    $('#coursesDrop').appendTo($('#secondnav'))
+    $('#lectureButton').appendTo($('#secondnav'))
     $('#notificationDropdown').appendTo($('#secondnav'))
     $('#searchField').appendTo($('#secondnav'))
     $('#second-admin-nav').show()
@@ -207,6 +207,7 @@ $(document).on 'turbolinks:load', ->
     $('#adminMain').css('flex-direction', 'row')
     $('#adminHome').css('padding-right', '0.5rem')
     $('#adminCurrentLecture').css('padding-right', '0.5rem')
+    $('#mampfbrand').hide()
     return
 
     # on large display, use normal tag badges and course titles
@@ -216,7 +217,7 @@ $(document).on 'turbolinks:load', ->
     $('.tagbadgeshort').hide()
     $('.courseMenuItemShort').hide()
     $('#secondnav').hide()
-    $('#coursesDrop').appendTo($('#firstnav'))
+    $('#lectureButton').appendTo($('#firstnav'))
     $('#notificationDropdown').appendTo($('#firstnav'))
     $('#searchField').appendTo($('#firstnav'))
     $('#second-admin-nav').hide()
@@ -227,9 +228,10 @@ $(document).on 'turbolinks:load', ->
     $('#adminMain').removeAttr('style')
     $('#adminHome').removeAttr('style')
     $('#adminCurrentLecture').removeAttr('style')
+    $('#mampfbrand').show()
     return
 
-    # highlight tagbadges if screen is very small
+  # highlight tagbadges if screen is very small
   if window.matchMedia("screen and (max-width: 767px)").matches
     mobileDisplay()
 
@@ -287,10 +289,27 @@ $(document).on 'turbolinks:load', ->
         $('#structure-item-' + s).show()
     return
 
+  $(document).on 'change', '#lecture_course_id', ->
+    $('#lecture_term_id').removeClass('is-invalid')
+    $('#new-lecture-term-error').empty()
+    courseId = parseInt($(this).val())
+    termInfo = $(this).data('terminfo').filter (x) -> x[0] == courseId
+    console.log termInfo[0]
+    if termInfo[0][1]
+      $('#newLectureTerm').hide()
+      $('#lecture_term_id').prop('disabled', true)
+      $('#newLectureSort').hide()
+    else
+      $('#newLectureTerm').show()
+      $('#lecture_term_id').prop('disabled', false)
+      $('#newLectureSort').hide()
+    return
+
   return
 
 # clean up everything before turbolinks caches
 $(document).on 'turbolinks:before-cache', ->
   $('.lecture-tag').removeClass('badge-warning').addClass('badge-light')
   $('.lecture-lesson').removeClass('badge-info').addClass('badge-secondary')
+  $(document).off 'change', '#lecture_course_id'
   return

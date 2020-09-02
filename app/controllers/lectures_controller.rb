@@ -1,7 +1,7 @@
 # LecturesController
 class LecturesController < ApplicationController
   include ActionController::RequestForgeryProtection
-  before_action :set_lecture, except: [:new, :create]
+  before_action :set_lecture, except: [:new, :create, :search]
   before_action :set_erdbeere_data, only: [:show_structures, :edit_structures]
   authorize_resource
   before_action :check_for_consent
@@ -38,7 +38,6 @@ class LecturesController < ApplicationController
   end
 
   def show
-    cookies[:current_course] = @lecture.course.id
     cookies[:current_lecture] = @lecture.id
     # deactivate http caching for the moment
     if stale?(etag: @lecture,
@@ -78,6 +77,7 @@ class LecturesController < ApplicationController
     @lecture = Lecture.new(lecture_params)
     @lecture.save
     if @lecture.valid?
+      @lecture.update(sort: 'special') if @lecture.course.term_independent
       # set organizational_concept to default
       set_organizational_defaults
       # set lenguage to default language
@@ -159,7 +159,6 @@ class LecturesController < ApplicationController
 
   def organizational
     cookies[:current_lecture] = @lecture.id
-    cookies[:current_course] = @lecture.course.id
     I18n.locale = @lecture.locale_with_inheritance
     render layout: 'application'
   end
@@ -215,6 +214,18 @@ class LecturesController < ApplicationController
   def open_comments
     @lecture.open_comments!(current_user)
     redirect_to edit_lecture_path(@lecture)
+  end
+
+  def search
+    search = Lecture.search_by(search_params, params[:page])
+    search.execute
+    results = search.results
+    @total = search.total
+    @lectures = Kaminari.paginate_array(results, total_count: @total)
+                        .page(params[:page]).per(search_params[:per])
+    return unless @total.zero?
+    return unless search_params[:fulltext]&.length > 1
+    @similar_titles = Course.similar_courses(search_params[:fulltext])
   end
 
   private
@@ -331,5 +342,20 @@ class LecturesController < ApplicationController
       s['id'].to_i.in?(@structure_ids)
     end
     @properties = response_hash['included']
+  end
+
+  def search_params
+    types = params[:search][:types]
+    types = [types] if types && !types.kind_of?(Array)
+    types -= [''] if types
+    types = nil if types == []
+    params[:search][:types] = types
+    params[:search][:user_id] = current_user.id
+    params.require(:search).permit(:all_types, :all_terms, :all_programs,
+                                   :all_teachers, :fulltext, :per, :user_id,
+                                   types: [],
+                                   term_ids: [],
+                                   program_ids: [],
+                                   teacher_ids: [])
   end
 end

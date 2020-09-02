@@ -1,44 +1,119 @@
-<% if Term.active %>
-	<h4>
-		Mein Semester - <%= Term.active.to_label %>
-	</h4>
-	<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 mt-3">
-		<%= render partial: 'main/start/teachable',
-							 collection: @current_stuff,
-							 locals: { current: true,
-							 					 subscribed: true },
-							 as: :teachable %>
+<div class="accordion" id="subscriptionsAccordion">
+	<% if Term.active %>
+		<div class="card">
+			<div class="card-header">
+				<h4>
+					<%= link_to t('profile.my_term_html', term: Term.active.to_label),
+											'#collapseCurrentStuff',
+											class: text_dark(@current_stuff.any?),
+											id: 'currentStuffLink',
+											data: { toggle: 'collapse',
+															target: '#collapseCurrentStuff'} %>
+				</h4>
+			</div>
+			<div class="subscriptionsCollapse <%= show_collapse(@current_stuff.any?) %>" id="collapseCurrentStuff"
+				 	 data-parent="#subscriptionsAccordion" data-link="#currentStuffLink">
+				<div class="card-body">
+					<div class="row row-cols-1 row-cols-xs-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-6"
+							 id="collapseCurrentStuffContent">
+						<% if @current_stuff.any? %>
+							<%= render partial: 'main/start/teachable',
+												 collection: @current_stuff,
+												 locals: { current: true,
+										 							 subscribed: true,
+									 								 parent: 'current_subscribed' },
+									 		 	 as: :teachable %>
+						<% end %>
+					</div>
+					<%= tag.div id: 'emptyCurrentStuff',
+											style: @current_stuff.any? ? 'display: none;' : ''  do %>
+						<%= t('profile.no_current_stuff') %>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	<% end %>
+	<div class="card">
+		<div class="card-header">
+			<h4>
+				<%= link_to t('profile.inactive_lectures'),
+										'#collapseInactiveLectures',
+										class: text_dark(@current_stuff.empty?),
+										id: 'inactiveLecturesLink',
+										data: { toggle: 'collapse',
+														target: '#collapseInactiveLectures' } %>
+
+			</h4>
+		</div>
+		<div class="subscriptionsCollapse <%= show_collapse(@current_stuff.empty?) %>"
+				 id="collapseInactiveLectures"
+				 data-parent="#subscriptionsAccordion" data-link="#inactiveLecturesLink">
+			<div class="card-body">
+				<div class="row row-cols-1 row-cols-xs-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-6"
+						 id="collapseInactiveLecturesContent">
+					<% if @current_stuff.empty? %>
+						<%= render partial: 'main/start/teachable',
+											 collection: @inactive_lectures,
+											 locals: { current: false,
+									 							 subscribed: true,
+									 							 parent: 'inactive' },
+		  							 	 as: :teachable %>
+		  		<% end %>
+				</div>
+				<%= tag.div id: 'emptyInactiveLectures',
+									style: @current_stuff.empty? && @inactive_lectures&.empty? ? '' : 'display: none;' do %>
+				<%= t('profile.no_inactive_stuff') %>
+			<% end %>
+			</div>
+		</div>
 	</div>
-<% end %>
-<h4>
-	Weitere abonnierte Veranstaltungen
-</h4>
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 mt-3">
-	<%= render partial: 'main/start/teachable',
-						 collection: @inactive_lectures,
-						 locals: { current: false,
-						 					 subscribed: true },
-						 as: :teachable %>
-</div>
-<% if Term.active %>
-	<h4>
-		Aktuelle Veranstaltungen - <%= Term.active.to_label %>
-	</h4>
-	<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 mt-3">
-		<%= render partial: 'main/start/teachable',
-							 collection: @other_current_lectures,
-							 locals: { current: true,
-							 					 subscribed: false },
-							 as: :teachable %>
+	<% if Term.active %>
+		<div class="card">
+			<div class="card-header">
+				<h4>
+					<%= link_to t('profile.active_nonsubscribed_lectures_html',
+												term: Term.active.to_label),
+											'#collapseAllCurrent',
+											class: 'text-dark',
+											id: 'allCurrentLink',
+											data: { toggle: 'collapse',
+															target: '#collapseAllCurrent' } %>
+				</h4>
+			</div>
+			<div class="collapse subscriptionsCollapse" id="collapseAllCurrent"
+					 data-parent="#subscriptionsAccordion" data-link="#allCurrentLink">
+				<div class="card-body">
+					<div class="row row-cols-1 row-cols-xs-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-6"
+							 id="collapseAllCurrentContent">
+					</div>
+					<%= tag.div id: 'emptyAllCurrent',
+											style: 'display: none;' do %>
+						<%= t('profile.no_current_at_all') %>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	<% end %>
+	<div class="card mb-3">
+		<div class="card-header">
+			<h4>
+				<%= link_to t('profile.lecture_search'),
+										'#collapseLectureSearch',
+										class: 'text-dark',
+										id: 'lectureSearchLink',
+										data: { toggle: 'collapse',
+														target: '#collapseLectureSearch' } %>
+			</h4>
+		</div>
+		<div class="collapse subscriptionsCollapse" id="collapseLectureSearch"
+				 data-parent="#subscriptionsAccordion"
+				 data-link="#lectureSearchLink">
+			<div class="card-body">
+				<%= render partial: 'main/start/lecture_search' %>
+				<div id="lecture-search-results">
+				</div>
+			</div>
+		</div>
 	</div>
-<% end %>
-<h4>
-	Sonstige Veranstaltungen
-</h4>
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 mt-3">
-	<%= render partial: 'main/start/teachable',
-						 collection: @nonsubscribed_lectures,
-						 locals: { current: false,
-						 					 subscribed: false },
-						 as: :teachable %>
 </div>
+<%= render partial: 'profile/subscription_modal' %>

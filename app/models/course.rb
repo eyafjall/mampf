@@ -49,6 +49,10 @@ class Course < ApplicationRecord
   # as well
   before_destroy :destroy_forum
 
+  # include uploader to realize screenshot upload
+  # this makes use of the shrine gem
+  include ScreenshotUploader[:image]
+
   # The next methods coexist for lectures and lessons as well.
   # Therefore, they can be called on any *teachable*
 
@@ -127,9 +131,7 @@ class Course < ApplicationRecord
   end
 
   def subscribable_lectures_by_date(user)
-    subscribable_lectures(user).to_a.sort do |i, j|
-      j.term.begin_date <=> i.term.begin_date
-    end
+    subscribable_lectures(user).sort
   end
 
   def restricted?
@@ -173,15 +175,11 @@ class Course < ApplicationRecord
   end
 
   def lectures_by_date
-    lectures.to_a.sort do |i, j|
-      j.term.begin_date <=> i.term.begin_date
-    end
+    lectures.sort
   end
 
   def published_lectures_by_date
-    published_lectures.to_a.sort do |i, j|
-      j.term.begin_date <=> i.term.begin_date
-    end
+    published_lectures.sort
   end
 
   # returns the array of all tags (sorted by title) together with
@@ -192,42 +190,9 @@ class Course < ApplicationRecord
         .map { |t| [t[:title], t[:id]] }
   end
 
-  # extracts  the id of the lecture that the user has chosen as
-  # primary lecture for this module
-  # (that is the one that has the first position in the lectures carousel in
-  # the course view)
-  # Example:
-  # course.extras({"name"=>"John Smith", "course-3"=>"1",
-  #  "primary_lecture-3"=>"3", "lecture-3"=>"1"})
-  # {"primary_lecture_id"=>3}
-  def extras(user_params)
-    modules = {}
-    primary_id = user_params['primary_lecture-' + id.to_s]
-    modules['primary_lecture_id'] = primary_id.to_i.zero? ? nil : primary_id.to_i
-    modules
-  end
-
   # returns all items related to all lectures associated to this course
   def items
     lectures.collect(&:items).flatten
-  end
-
-  def primary_lecture(user, eagerload: false)
-    user_join = CourseUserJoin.where(course: self, user: user)
-    return unless user_join.any?
-    unless eagerload
-      return Lecture.find_by_id(user_join.first.primary_lecture_id)
-    end
-    Lecture.includes(:teacher, :term, :editors, :users,
-                     :announcements, :imported_media,
-                     course: [:editors],
-                     media: [:teachable, :tags],
-                     lessons: [media: [:tags]],
-                     chapters: [:lecture,
-                                sections: [lessons: [:tags],
-                                           chapter: [:lecture],
-                                           tags: [:notions, :lessons]]])
-           .find_by_id(user_join.first.primary_lecture_id)
   end
 
   def subscribed_lectures(user)
@@ -240,9 +205,7 @@ class Course < ApplicationRecord
   end
 
   def subscribed_lectures_by_date(user)
-    subscribed_lectures(user).to_a.sort do |i, j|
-      j.term.begin_date <=> i.term.begin_date
-    end
+    subscribed_lectures(user).sort
   end
 
   def subscribed_by?(user)
@@ -445,6 +408,40 @@ class Course < ApplicationRecord
                                               user: user,
                                               with_unread_topics_counts: true)
     forum_view.first.messageboards.first.unread_topics_count
+  end
+
+  def image_url_with_host
+    return unless image
+    image_url(host: host)
+  end
+
+  def normalized_image_url_with_host
+    return unless image && image(:normalized)
+    image_url(:normalized, host: host)
+  end
+
+  def image_filename
+    return unless image
+    image.metadata['filename']
+  end
+
+  def image_size
+    return unless image
+    image.metadata['size']
+  end
+
+  def image_resolution
+    return unless image
+    "#{image.metadata['width']}x#{image.metadata['height']}"
+  end
+
+  # returns all courses whose title is close to the given search string
+  # wrt to the JaroWinkler metric
+  def self.similar_courses(search_string)
+    jarowinkler = FuzzyStringMatch::JaroWinkler.create(:pure)
+    titles = Course.pluck(:title)
+    titles.select { |t| jarowinkler.getDistance(t.downcase,
+                                                search_string.downcase) > 0.8 }
   end
 
   private

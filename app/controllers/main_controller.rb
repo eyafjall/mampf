@@ -4,12 +4,12 @@ class MainController < ApplicationController
                                                  :sponsors]
   before_action :check_for_consent
   authorize_resource class: false, only: :start
+  layout 'application_no_sidebar'
 
   def home
     if user_signed_in?
       cookies[:locale] = current_user.locale
     end
-    render layout: 'application_no_sidebar'
   end
 
   def error
@@ -19,11 +19,9 @@ class MainController < ApplicationController
   def news
     @announcements = Announcement.where(lecture: nil).order(:created_at)
                                  .reverse
-    render layout: 'application_no_sidebar'
   end
 
   def sponsors
-    render layout: 'application_no_sidebar'
   end
 
   def comments
@@ -34,23 +32,14 @@ class MainController < ApplicationController
     end
     @media_array = Kaminari.paginate_array(@media_comments)
                            .page(params[:page]).per(10)
-    render layout: 'application_no_sidebar'
   end
 
   def start
-    @current_stuff = current_user.active_lectures.includes(:course, :term)
-                                 .natural_sort_by(&:title) +
-                       current_user.courses_without_lectures
-                                   .natural_sort_by(&:title)
-    @inactive_lectures = current_user.inactive_lectures.includes(:course, :term)
-                                     .sort
-    @other_current_lectures = (Lecture.published.in_current_term.includes(:course, :term) -
-                                current_user.active_lectures).sort
-    @nonsubscribed_lectures = current_user.nonsubscribed_lectures.published
-                                          .where.not(term: Term.active)
-                                          .includes(:term, :course)
-                                          .sort
-    render layout: 'application_no_sidebar'
+    @current_stuff = current_user.current_teachables
+    if @current_stuff.empty?
+      @inactive_lectures = current_user.inactive_lectures.includes(:course, :term)
+                                       .sort
+    end
   end
 
   private

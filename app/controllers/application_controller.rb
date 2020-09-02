@@ -16,8 +16,7 @@ class ApplicationController < ActionController::Base
     end
     @current_user ||= super.tap do |user|
       ::ActiveRecord::Associations::Preloader.new
-                                             .preload(user, [:courses,
-                                                             :lectures,
+                                             .preload(user, [:lectures,
                                                              :edited_media,
                                                              :clickers,
                                                              edited_courses: [:editors, lectures: [:term, :teacher]],
@@ -40,9 +39,14 @@ class ApplicationController < ActionController::Base
 
   # determine where to send the user after login
   def after_sign_in_path_for(resource_or_scope)
-    # checks if user consented to DSGVO and has ever edited his/her profile
-    # if profile was never edited, redirect to profil editing
-    stored_location_for(resource_or_scope) || super
+    # see https://github.com/heartcombo/devise/wiki/How-To:-Redirect-back-to-current-page-after-sign-in,-sign-out,-sign-up,-update
+    # see https://www.rubydoc.info/github/plataformatec/devise/Devise%2FControllers%2FHelpers:after_sign_in_path_for
+    stored = stored_location_for(resource_or_scope)
+    if stored.present? && stored != super
+      stored
+    else
+      start_path
+    end
   end
 
 #  def self.default_url_options(options={})

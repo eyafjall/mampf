@@ -78,7 +78,7 @@ en:
     muesli: 'MUESLI'
     board: 'Board'
     comments: 'Comments'
-    organizational: 'General Information'
+    organizational_html: 'General Information'
     announcements: 'Announcements'
     reste:
       singular: 'Miscellaneous'
@@ -310,6 +310,9 @@ en:
       oberseminar: 'Research Seminar'
       oberseminar_short: 'RS'
       oberseminar_content: 'Research Seminar Contents'
+      special: 'Special'
+      special_short: ''
+      special_content: 'Content'
       new_lecture: 'Create a new event series'
       no_courses_yet: 'You have to create a course first.'
       no_terms_yet: 'You have to create a term first.'
@@ -330,6 +333,7 @@ en:
       new_notifications: 'new notifications'
       new_media: 'new media'
       new_posts: 'new forum posts'
+      no_rights: 'You are not authorized to subscribe this event series.'
       info:
         course: >
           Here you can select the course to which this event series belongs.
@@ -484,6 +488,35 @@ en:
         comments_disabled: >
           By default, comments for newly published media are enabled, and you
           can disable them upon publishing. Here you can reverse this.
+        search_type: >
+          Here you have to select (in the sense of
+          <i>
+          OR
+          </i>
+          ) of what type the event series is.
+        search_program: >
+          Here you have to select (in the sense of
+          <i>
+          OR
+          </i>
+          ) to which program the event series belongs to.
+        search_teacher: >
+          Here you can select the teacher of the event series (in the sense of
+          <i>
+          OR
+          </i>
+          ).
+        search_term: >
+          Here you can select in which term the event series took places or
+          takes place, respectively (in the sense of
+          <i>
+          OR
+          </i>
+          ).
+        search_fulltext: >
+          Here you can enter text that will be searched for in the title of the
+          event series. If you leave the text field empty (or enter less than two letters),
+          it will be ignored.
       show_media: 'Show media'
       workflow: 'Workflow'
       content_mode: 'Content determination'
@@ -550,6 +583,12 @@ en:
       additional_information_visible: 'Additional information visible'
       divisions: 'Divisions'
       programs: 'Study Paths'
+      term_independent: 'independent of terms'
+      term_independence: 'This course is independent of terms.'
+      image: 'Image'
+      no_image: >
+        No image has been uploaded yet. Therefore, the generic image will be
+        used for event cards.
       info:
         title: >
           Here you can enter the title of the course. Typically, this should be
@@ -594,6 +633,15 @@ en:
         programs: >
           Here you can select to ehich study paths of which subjects this course
           is associated to.
+        term_independent: >
+          Check this box for courses that do not match the usual pattern of
+          courses that have lectures, seminars and so on by the semester, but
+          are independent of the term. This might be useful for things like
+          a Help Deks for students. This setting can only be changed as long
+          as there is no event series associated to this course.
+        image: >
+          You can upload an image that visualizes this course. It will be used
+          in the cards that appear in MaMpf's start page.
     chapter:
       edit: 'Edit %{chapter}'
       position: 'Position after %{chapter_name}'
@@ -1618,6 +1666,26 @@ en:
       You have not consented to our privacy policy.
     sure: 'Are you sure?'
     locale: 'Language'
+    suscribe_lecture: 'Subscribe event series'
+    passphrase_required: >
+      You want to subscribe the event series %{teachable_title}. It is protected
+      by a pass phrase. Please enter it here.
+    my_term_html: My Term &ndash; %{term}
+    inactive_lectures: Futher subscribed event series
+    active_nonsubscribed_lectures_html: >
+      Current event series &ndash; %{term}
+    lecture_search: Search for event series
+    no_current_stuff: >
+      You have not yet subscribed any event series of the current term.
+    no_inactive_stuff: >
+      You have not yet subscribed any event series outside of the current term.
+    no_current_at_all: >
+      In the current term, no event series have yet been published.
+    new_design: >
+      Use the new *experimental* design (personalized start page, no dropdown
+      menu for lecture selection)
+    other_preferences: >
+      Other Preferences
   mampf_news:
     title: 'MaMpf News'
     check_notifications: 'Clear all'
@@ -1635,6 +1703,7 @@ en:
     subscribe_course: 'You can subscribe it via your profile.'
     subscribe_course_html: 'You can subscribe it via your %{profile}.'
     profile: 'profile'
+    goto_profile: "Visit your profile"
     mampf_announcement: 'New announcement about MaMpf'
     lecture_announcement: 'New announcement in %{title}'
     new_lecture: 'New event series %{title}'
@@ -1699,6 +1768,12 @@ en:
     unpublished: 'This medium is unpublished.'
     locked: 'This medium is locked.'
     imported: 'This medium has been imported.'
+    theme_based: 'theme based'
+    lecture_only: 'only event series'
+    improve_visibility: >
+      By setting the visibility to "all" you can see media at the level of the
+      course %{course} whose cxontents have not yet been treated in the current
+      event series.
     waiting_for_tag: >
       This medium ist situated at course level and refers to tags,
       that have not (yet) been treated in the current event series.
@@ -1706,6 +1781,36 @@ en:
       moment. It will become visible for subscribers as soon as at least one
       tag of this medium will be assciated to at least one section of this
       lecture or to a published medium associated to this event series.
+    info:
+      visibility_html: >
+        Here you can adjust which media will be displayed. You have the
+        following options
+        <ul>
+        <li>
+        <i>
+        theme based:
+        </i>
+        This is the default setting and also the recommended setting.
+        All media from the current event series will be displayed.
+        Furthermore, all media that are associated to the course
+        will be displayed (which should fit, no matter who the teacher of the
+        event series is), but only those whose content has already been
+        treated in the current event series.
+        </li>
+        <li>
+        <i>
+        only event series:
+        </i>
+        All media from the current event series will be displayed.
+        </li>
+        <li>
+        <i>
+        all:
+        </i>
+        All media from the current event series and all media associated to the
+        course will be displayed.
+        </li>
+        </ul>
   video:
     video: 'Video'
     no_video: 'There is no video present.'
@@ -1714,6 +1819,8 @@ en:
     length: 'Length'
     resolution: 'Resolution'
     size: 'Size'
+  image:
+    resolution: 'Resolution'
   manuscript:
     manuscript: 'Manuscript'
     no_manuscript: 'There is no manuscript present.'
@@ -1922,6 +2029,10 @@ en:
     settings: 'profile settings'
     alternative: 'Did you mean something else?'
     similar: 'Tags similar to %{search_string}'
+    courses_with_similar_titles: >
+      You might try the following fulltext terms and start the search again.
+    click_and_paste: >
+      If you click this term, it will be copied to the "fulltext" field.
   errors:
     profile:
       passphrase: 'Incorrect pass phrase'
@@ -2019,6 +2130,7 @@ en:
     thread_subscribed: Subscribed
     who_and_when: '%{when} ago by %{who}'
     comment_verb: Add Comment
+    no_comments: There are no new comments.
     media_comments: >
       Number of media in your subscribed courses and event series
       for which there are new comments for %{count}:
@@ -2043,12 +2155,12 @@ en:
     text: 'Text'
     new_lecture_subject: 'New event series %{title}'
     new_lecture: 'A new event series has been made available: %{title}.'
-    subscribe_lecture_html: 'You can subscribe to it in your %{profile}.'
+    subscribe_lecture: 'You can subscribe to it in your profile settings.'
     subscribe_lecture_text: >
       You can subscribe to it in your profile settings.
     new_course_subject: 'New Course %{title}'
     new_course: 'A new course has been made available: %{title}.'
-    subscribe_course_html: 'You can subscribe to it in your %{profile}.'
+    subscribe_course: 'You can subscribe to it in your profile settings.'
     subscribe_course_text: >
       You can subscribe to it in your profile settings.
   statistics:
@@ -2087,6 +2199,7 @@ en:
     courses: 'Courses'
     term: 'Term'
     teacher: 'Teacher'
+    teachers: 'Teachers'
     title: 'Title'
     short_title: 'Short title'
     editors: 'Editors'
@@ -2215,6 +2328,8 @@ en:
     comments_for: 'Comments for %{subject}'
     unsubscribe: 'Unsubscribe'
     subscribe: 'Subscribe'
+    programs: 'Programs'
+    visibility: 'Visibility'
   warnings:
     save_before: 'Before you continue, you need to save or discard your changes'
     unsaved_changes: >
@@ -2447,10 +2562,15 @@ en:
                 An event series with the same combination of course, term and teacher
                 already exists.
               required: 'You need to give a course.'
+              already_present: >
+                For courses that are term independent there can be only one
+                'event series'.
             content_mode:
               inclusion: 'Invalid mode.'
             term:
               required: 'You need to give a term.'
+              present: >
+                Term was given, but associated course is independent of terms
             teacher:
               required: 'You need to give a teacher.'
         lesson:
