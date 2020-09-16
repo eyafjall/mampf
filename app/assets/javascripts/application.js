@@ -19,7 +19,10 @@
 //= require selectize
 //= require jquery.fileDownload
 //= require jquery-ui
+//= require select2
+//= require select2_locale_de
 //= require trix
+//= require clipboard
 //= require _selectize_turbolinks_fix
 //= require administration
 //= require announcements
@@ -44,6 +47,7 @@
 //= require registration
 //= require remarks
 //= require sections
+//= require submissions
 //= require tags
 //= require terms
 //= require tex_preview

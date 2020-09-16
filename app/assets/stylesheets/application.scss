@@ -67,6 +67,8 @@ $container-max-widths: (
 @import 'selectize';
 @import 'selectize.default';
 @import "trix";
+@import "select2";
+@import "select2-bootstrap";
 
 trix-toolbar .trix-button-row {
   flex-wrap: wrap;
@@ -212,6 +214,10 @@ $modal-xxl:                   1600px !default;
 
 .propertiesCardBody {
   overflow-y: scroll;
+}
+
+#profileChange {
+  display: none;
 }
 
 .revertCommontator

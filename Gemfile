@@ -91,6 +91,9 @@ gem 'acts_as_votable'
 gem 'sprockets-rails',
   git: 'https://github.com/rails/sprockets-rails',
   branch: 'master'
+gem 'premailer-rails'
+gem 'select2-rails'
+gem 'clipboard-rails'
 
 group :development, :docker_development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -107,6 +110,8 @@ group :development, :docker_development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'rubocop', '~> 0.54.0', require: false
+  gem 'pgreset'
+  gem 'marcel'
 #  gem 'bullet'
 end
 
@@ -121,5 +126,3 @@ group :test do
   gem 'launchy'
   gem 'simplecov', require: false
 end
-
-gem 'premailer-rails'

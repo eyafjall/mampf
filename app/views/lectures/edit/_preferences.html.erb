@@ -1,19 +1,15 @@
   <div class="card bg-light">
-    <div class="card-header" role="tab" id="preferences_heading">
+    <div class="card-header clickable"
+         role="tab"
+         id="preferences_heading"
+         data-toggle="collapse"
+         data-target="#preferences_collapse"
+         aria-expanded="false" aria-controls="preferences_collapse">
       <div class="row">
-        <div class="col-6">
+        <div class="col-12">
           <h5>
             <%= t('basics.preferences') %>
           </h5>
-        </div>
-        <div class="col-6 text-right">
-          <a class="btn btn-sm btn-outline-primary"
-             data-toggle="collapse"
-             href="#preferences_collapse"
-             id="preferences_collapse_button"
-             aria-expanded="false" aria-controls="preferences_collapse">
-            <%= t('buttons.toggle') %>
-          </a>
         </div>
       </div>
     </div>
@@ -146,6 +142,22 @@
               </div>
             </div>
           </div>
+          <% if !lecture.term %>
+            <div class="row">
+              <div class="col-12">
+                <div class="custom-control custom-checkbox">
+                  <%= f.check_box :disable_teacher_display,
+                                  class: 'custom-control-input',
+                                  disabled: inspection %>
+                  <%= f.label :disable_teacher_display,
+                              t('admin.lecture.disable_teacher_display'),
+                              { class: 'custom-control-label' } %>
+                  <%= helpdesk(t('admin.lecture.info.disable_teacher_display'),
+                             false) %>
+                </div>
+              </div>
+            </div>
+          <% end %>
           <div class="row">
             <div class="col-12 text-center">
               <div id="lecture-preferences-warning">

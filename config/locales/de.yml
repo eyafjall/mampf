@@ -69,6 +69,7 @@ de:
       short: 'Sns'
     course: 'Modul'
     mampf_news: 'MaMpf-News'
+    submissions: 'Abgaben'
   unauthorized:
     default: >
       Du bist nicht berechtigt, auf diese Seite zuzugreifen.
@@ -345,6 +346,7 @@ de:
       new_posts: 'neue Forenbeiträge'
       no_rights: >
         Du hast keine Berechtigung, diese Veranstaltung zu abonnieren.
+      disable_teacher_display: Anzeige des DozentInnen-Namens unterdrücken
       info:
         course: >
           Hier kannst Du das Modul auswählen, zu dem diese
@@ -469,6 +471,9 @@ de:
           stehende Text. Als Vorschlag gibt es von uns einen
           Mustertext, den Du beliebig editieren kannst
           (und solltest).
+        organizational_on_top: >
+          Wenn du diesen Haken setzt, wird die Seite "Organisatorisches"
+          als Startseite für diese Veranstaltung erscheinen.
         muesli: >
           Wenn Du diesen Haken setzt, wird in der
           Sidebar für diese Veranstaltung der Link zu MUESLI aktiviert.
@@ -550,6 +555,12 @@ de:
           Hier kannst Du Text eingeben, nach dem im Titel der Veranstaltung
           gesucht wird. Wenn Du dieses Feld leer lässt (bzw. weniger als zwei Buchstaben
           eingibst), wird es bei der Suche ignoriert.
+        disable_teacher_display: >
+          Wenn Du dieses Feld aktivierst, wird auf der Vorlesungs-Karten auf der
+          Startseite und auf der Vorlesungsseite für generische Nutzer
+          der DozentInnen-Name nicht angezeigt. Das macht z.B. Sinn, wenn
+          eine semesterunabhängige Veranstaltung von jemandem nur administrativ
+          als "DozentIn" begleitet wird.
       show_media: 'Medien einblenden'
       workflow: 'Workflow'
       content_mode: 'Inhaltsermittlung'
@@ -576,6 +587,7 @@ de:
         eingetragen.
       imported_media: 'Importierte Medien'
       organizational_visible: 'Organisatorisches sichtbar'
+      organizational_on_top: 'Organisatorisches als Startseite'
       uses_muesli: 'Veranstaltung verwendet MÜSLI'
       first_chapter: 'Nummer des ersten Kapitels/Vortrags'
       first_section: 'Nummer des ersten Abschnitts'
@@ -1733,6 +1745,10 @@ de:
       export_probes: Quizdaten exportieren
       start: Startdatum
       end: Enddatum
+    tutorial:
+      new: 'Neues Tutorium anlegen'
+    assignment:
+      new: 'Neue Hausaufgabe anlegen'
   profile:
     account: 'Account'
     name: 'Anzeigename'
@@ -1780,7 +1796,7 @@ de:
     locale: 'Sprache'
     subscribe_lecture: 'Veranstaltung abonnieren'
     passphrase_required: >
-      Du möchtest die Veranstaltung %{teachable_title} abonnieren. Diese ist
+      Du möchtest die Veranstaltung %{lecture_title} abonnieren. Diese ist
       durch einen Zugangsschlüssel geschützt. Gib diesen bitte hier ein.
     my_term_html: Mein Semester &ndash; %{term}
     inactive_lectures: Weitere abonnierte Veranstaltungen
@@ -1799,6 +1815,9 @@ de:
       für Veranstaltungswahl)
     other_preferences: >
       Sonstige Einstellungen
+    changes_made: >
+      Es gibt ungespeicherte Änderungen. Bitte denke daran, diese zu speichern,
+      damit die Änderungen wirksam werden.
   mampf_news:
     title: 'MaMpf-News'
     check_notifications: 'Alle erledigen'
@@ -1883,31 +1902,32 @@ de:
     unpublished: 'Dieses Medium ist nicht veröffentlicht.'
     locked: 'Dieses Medium ist gesperrt.'
     imported: 'Dieses Medium wurde importiert.'
-    theme_based: 'thematisch'
-    lecture_only: 'nur Vorlesung'
+    theme_based: 'zu bereits Behandeltem'
+    lecture_only: 'keine'
     improve_visibility: >
-      Indem du die Sichtbarkeit auf "alle" stellst, kannst du auch Medien
-      anzeigen, die auf der Ebene des Moduls %{course} angesiedelt sind,
+      Indem du bei Zusatzmaterialien "alle" auswählst, kannst du dir auch Medien
+      anzeigen lassen, die auf der Ebene des Moduls %{course} angesiedelt sind,
       deren Inhalte in der aktuellen Vorlesung aber noch nicht behandelt wurden.
     waiting_for_tag: >
       Dieses Medium ist auf Modulebene angesiedelt und bezieht sich auf Tags,
       die in der vorliegenden Veranstaltung (noch) nicht behandelt wurden.
-      Es ist für AbonnentInnen dieser Veranstaltung deshalb im Augenblick nicht
-      sichtbar in der Sichtbarkeits-Standardeinstellung "thematisch".
-      Es wird in dieser erst dann sichtbar, wenn mindestens einer der
+      Es ist für AbonnentInnen dieser Veranstaltung deshalb nicht
+      sichtbar, wenn die Standardeinstellung für die Zusatzmaterialien
+      "zu bereits Behandeltem" ausgewählt ist.
+      Es wird bei dieser Auswahl erst dann sichtbar, wenn mindestens einer der
       assoziierten Tags in einem Abschnitt dieser Vorlesung auftaucht oder
       zu einem veröffentlichten Medium auf Veranstaltungsebene assoziiert ist.
     info:
       visibility_html: >
-        Hier kannst Du einstellen, welche Medien angezeigt werden sollen.
+        Hier kannst Du einstellen, welche Zusatzmaterialien angezeigt werden sollen.
         Du hast die folgenden Möglichkeiten:
         <ul>
         <li>
         <i>
-        thematisch:
+        zu bereits Behandeltem:
         </i>
         Das ist die Standardeinstellung und auch die empfohlene
-        Einstellung. Du bekommst alle Medien aus der aktuellen Veranstaltun
+        Einstellung. Dir werden alle Medien aus der aktuellen Veranstaltung
         angezeigt. Darüber hinaus werden Medien angezeigt, die zu dem Modul
         gehören (die also unabhängig davon, wer die Veranstaltung hält, passen
         sollten), jedoch nur solche, deren Inhalt bereits in der aktuellen
@@ -1915,16 +1935,16 @@ de:
         </li>
         <li>
         <i>
-        nur Vorlesung:
+        keine:
         </i>
-        Du bekommst alle Medien aus der aktuellen Veranstaltung angezeigt.
+        Dir werden nur Medien aus der aktuellen Veranstaltung angezeigt.
         </li>
         <li>
         <i>
         alle:
         </i>
-        Du bekommst alle Medien aus der aktuellen Veranstaltung und alle Medien,
-        die zu dem Modul gehören, angezeigt.
+        Dir werden alle Medien aus der aktuellen Veranstaltung und alle Zusatzmaterialien
+        zu diesem Modul angezeigt.
         </li>
         </ul>
   video:
@@ -2268,6 +2288,20 @@ de:
     media_comments: >
       Anzahl der Medien in von den von Dir abonnierten
       Veranstaltungen bzw. Modulen, in denen es neue Kommentare gibt:
+  submission:
+    invalid_code: Der eingegebene Code ist ungültig für %{assignment}.
+    assignment_expired: Die Frist für diese Hausaufgabe ist bereits abgelaufen.
+    already_in: Bei dieser Abgabe bist Du schon dabei.
+    no_partners_no_leave: >
+      Du kannst nicht austreten, da Du die einzige Person in der Abgabegruppe
+      bist. Dafür kannst Du die Abgabe löschen.
+    nothing_here: >
+      Hier ist noch nichts hinterlegt - lege eine Abgabe an oder tritt einer
+      bei.
+    nothing_here_past: >
+      Zu dieser Hausaufgabe wurde nichts hinterlegt.
+  assignment:
+    expired: Die Abgabefrist ist abgelaufen.
   locales:
     en: 'englisch'
     de: 'deutsch'
@@ -2431,7 +2465,7 @@ de:
     question: 'Frage'
     answer: 'Antwort'
     answers: 'Antworten'
-    none: 'none'
+    none: 'keine'
     remark: 'Bemerkung'
     latex: 'LaTeX'
     quiz: 'Quiz'
@@ -2468,7 +2502,16 @@ de:
     unsubscribe: 'abbestellen'
     subscribe: 'abonnieren'
     programs: 'Studiengänge'
-    visibility: 'Sichtbarkeit'
+    visibility: 'Zusatzmaterialien'
+    tutor: 'TutorIn'
+    tutorials: 'Tutorien'
+    assignments: 'Hausaufgaben'
+    deadline: 'Abgabetermin'
+    tutorial: 'Tutorium'
+    code: 'Code'
+    files: 'Dateien'
+    partners: 'PartnerInnen'
+    expired: 'abgelaufen'
   access:
     unpublished: 'unveröffentlicht'
     all: 'frei'
@@ -2498,6 +2541,7 @@ de:
     create_program: 'Studiengang anlegen'
     create_subject: 'Fach anlegen'
     create_division: 'Teilbereich anlegen'
+    create: 'Anlegen'
     edit: 'Bearbeiten'
     content: 'Inhalt'
     hide_media: 'Medien ausblenden'
@@ -2553,6 +2597,9 @@ de:
     import_script_items: 'Inhaltsverzeichnis aus Skript übernehmen'
     close_comments: 'Diskussionen für alle Medien schließen'
     open_comments: 'Geschlossene Diskussionen alle wieder öffnen'
+    join: 'Beitreten'
+    copy_to_clipboard: 'in die Zwischenablage kopieren'
+    leave: 'Austreten'
   warnings:
     save_before: >
       Du musst zunächst die anderen Änderungen speichern oder verwerfen.
@@ -2654,6 +2701,9 @@ de:
     no_subject: 'Ein Fach mit der angeforderten id existiert nicht.'
     no_program: 'Ein Studiengang mit der angeforderten id existiert nicht.'
     no_division: 'Ein Teilbereich mit der angeforderten id existiert nicht.'
+    no_tutorial: 'Ein Tutorium mit der angeforderten id existiert nicht.'
+    no_submission: Eine Abgabe mit der angeforderten id existiert nicht.
+    no_assignment: Eine Hausaufgabe mit der angeforderten id existiert nicht.
   activerecord:
     errors:
       no_valid_url: 'Das ist keine gültige URL.'
@@ -2662,6 +2712,14 @@ de:
           attributes:
             details:
               blank: 'Es muss ein Text angegeben werden.'
+        assignment:
+          attributes:
+            title:
+              taken: >
+                Dieser Hausaufgabentitel ist für diese Veranstaltung bereits
+                vergeben.
+              blank: >
+                Es muss ein Titel angegeben werden.
         chapter:
           attributes:
             title:
@@ -2776,6 +2834,10 @@ de:
           attributes:
             title:
               blank: 'Es muss ein Titel angegeben werden.'
+        submission:
+          lecture_not_matching: >
+            Die zum Tutorium assoziierte Vorlesung sollte mit der zur
+            Hausaufgabe assoziierten Vorlesung übereinstimmen.
         tag:
           attributes:
             notions:
@@ -2791,12 +2853,23 @@ de:
             season:
               inclusion: 'Ungültiger Typ.'
               taken: 'Dieses Semester existiert bereits.'
+        tutorial:
+          attributes:
+            title:
+              taken: >
+                Dieser Tutoriumstitel ist für diese Veranstaltung bereits
+                vergeben.
+              blank: >
+                Es muss ein Titel angegeben werden.
         user:
           attributes:
             courses:
               blank: 'Es muss mindestens ein Modul abonniert werden.'
             name:
               blank: 'Es muss ein Anzeigename angegeben werden.'
+        user_submission_join:
+          only_one_per_assignment: >
+            Jede NutzerIn darf pro Hausaufgabe nur eine Abgabe vornehmen.
         vote:
           attributes:
             clicker:

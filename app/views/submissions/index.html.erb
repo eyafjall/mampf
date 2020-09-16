@@ -1,0 +1,12 @@
+<div class="row">
+	<% @assignments.each do |a| %>
+		<div class="col-12 col-xl-6 col-xxl-4 mb-3 submissionArea"
+				 data-id="<%= a.id %>">
+			<%= render partial: 'submissions/card',
+								 locals: { assignment: a,
+								 					 submission: a.find_submission(current_user) } %>
+		</div>
+	<% end %>
+</div>
+
+

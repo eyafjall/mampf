@@ -84,6 +84,7 @@ en:
       singular: 'Miscellaneous'
       short: 'Misc'
     course: 'Course'
+    submissions: 'Submissions'
   unauthorized:
     default: >
       You are not authorized to access this page.
@@ -334,6 +335,7 @@ en:
       new_media: 'new media'
       new_posts: 'new forum posts'
       no_rights: 'You are not authorized to subscribe this event series.'
+      disable_teacher_display: disable the display of the teacher's name
       info:
         course: >
           Here you can select the course to which this event series belongs.
@@ -439,6 +441,9 @@ en:
           the sidebar).
           The text they see will be the text below. As a suggestion, we have
           a default text that you may edit as you wish.
+        organizational_on_top: >
+          If you check this box, the page for general information will be the
+          starting page for this event series.
         muesli: >
           If you check this box, the link to MUESLI will be activated in the
           sidebar for this event series.
@@ -517,6 +522,11 @@ en:
           Here you can enter text that will be searched for in the title of the
           event series. If you leave the text field empty (or enter less than two letters),
           it will be ignored.
+        disable_teacher_display: >
+          If you check this box, the teacher's name will be omitted from the
+          lecture card on the start page and from the lecture page for generic
+          users. This could make sense e.g. if a lecture that is term
+          independent is only administratively supervised by a "teacher".
       show_media: 'Show media'
       workflow: 'Workflow'
       content_mode: 'Content determination'
@@ -540,6 +550,7 @@ en:
         There are no additional event series editors.
       imported_media: 'Imported Media'
       organizational_visible: 'General information visible'
+      organizational_on_top: 'General Information as start page'
       uses_muesli: 'Event series uses MUESLI'
       first_chapter: 'Number of the first chapter (talk)'
       first_section: 'Nummer of the first section'
@@ -1623,6 +1634,10 @@ en:
       export_probes: Export Probes
       start: Start Date
       end: End Date
+    tutorial:
+      new: 'Add tutorial'
+    assignment:
+      new: 'Add assignment'
   profile:
     account: 'Account'
     name: 'Display name'
@@ -1668,7 +1683,7 @@ en:
     locale: 'Language'
     suscribe_lecture: 'Subscribe event series'
     passphrase_required: >
-      You want to subscribe the event series %{teachable_title}. It is protected
+      You want to subscribe the event series %{lecture_title}. It is protected
       by a pass phrase. Please enter it here.
     my_term_html: My Term &ndash; %{term}
     inactive_lectures: Futher subscribed event series
@@ -1686,6 +1701,9 @@ en:
       menu for lecture selection)
     other_preferences: >
       Other Preferences
+    changes_made: >
+      There are unsaved changes. In order to make them apply you have to save
+      them.
   mampf_news:
     title: 'MaMpf News'
     check_notifications: 'Clear all'
@@ -1761,18 +1779,18 @@ en:
   next_lesson: 'next session'
   previous_lesson: 'previous session'
   mampf_map: 'MaMpf Map'
-  external_render: 'render in external tab'
+  external_render: 'render in an external tab'
   medium:
     details: 'view details'
     different_language: 'This medium is in %{language}.'
     unpublished: 'This medium is unpublished.'
     locked: 'This medium is locked.'
     imported: 'This medium has been imported.'
-    theme_based: 'theme based'
-    lecture_only: 'only event series'
+    theme_based: 'on topics dealt with'
+    lecture_only: 'no'
     improve_visibility: >
-      By setting the visibility to "all" you can see media at the level of the
-      course %{course} whose cxontents have not yet been treated in the current
+      Set additional material to "all" to see see media at the level of the
+      course %{course} dealing with topics that have not been addressed in the current
       event series.
     waiting_for_tag: >
       This medium ist situated at course level and refers to tags,
@@ -1783,23 +1801,23 @@ en:
       lecture or to a published medium associated to this event series.
     info:
       visibility_html: >
-        Here you can adjust which media will be displayed. You have the
+        Here you can adjust which additional material will be displayed. You have the
         following options
         <ul>
         <li>
         <i>
-        theme based:
+        on topics dealt with:
         </i>
-        This is the default setting and also the recommended setting.
+        This is the default setting and also recommended.
         All media from the current event series will be displayed.
         Furthermore, all media that are associated to the course
-        will be displayed (which should fit, no matter who the teacher of the
-        event series is), but only those whose content has already been
+        will be displayed (which should fit no matter who the teacher of the
+        event series is), but only those dealing with topics
         treated in the current event series.
         </li>
         <li>
         <i>
-        only event series:
+        no:
         </i>
         All media from the current event series will be displayed.
         </li>
@@ -1813,7 +1831,7 @@ en:
         </ul>
   video:
     video: 'Video'
-    no_video: 'There is no video present.'
+    no_video: 'There is no video.'
     play: 'THymE Player'
     download: 'download video'
     length: 'Length'
@@ -2137,6 +2155,21 @@ en:
   locales:
     en: 'English'
     de: 'German'
+  submission:
+    invalid_code: The code you entered is invalid for %{assignment}.
+    assignment_expired: >
+      The due date for this homework assignment has already
+      expired.
+    already_in: You are already a partner for this assgnment.
+    no_partners_no_leave: >
+      You cannot leave as you are the only person in this group (but you
+      you can delete this submission).
+    nothing_here: >
+      There is nothing here yet. Create a new submission or join one.
+    nothing_here_past: >
+      Nothing was submitted for this assignment.
+  assignment:
+    expired: The due date has expired.
   mailer:
     notification: 'MaMpf notification'
     notification_header: 'MaMpf notification'
@@ -2329,7 +2362,16 @@ en:
     unsubscribe: 'Unsubscribe'
     subscribe: 'Subscribe'
     programs: 'Programs'
-    visibility: 'Visibility'
+    visibility: 'Additional material'
+    tutorials: 'Tutorials'
+    tutor: 'Tutor'
+    assignments: 'Assignments'
+    deadline: 'Due Date'
+    tutorial: 'Tutorial'
+    code: 'Code'
+    files: 'Files'
+    partners: 'Partners'
+    expired: 'expired'
   warnings:
     save_before: 'Before you continue, you need to save or discard your changes'
     unsaved_changes: >
@@ -2363,6 +2405,7 @@ en:
     create_program: 'Create Study Path'
     create_subject: 'Create Subject'
     create_division: 'Create Division'
+    create: 'Create'
     edit: 'Edit'
     content: 'Content'
     hide_media: 'Hide Media'
@@ -2418,6 +2461,9 @@ en:
     import_script_items: 'Import table of contents from manuscript'
     close_comments: 'Close discussions for all related media'
     open_comments: 'Reopen all closed discussions'
+    join: 'Join'
+    copy_to_clipboard: 'Copy to Clipboard'
+    leave: 'Leave'
   confirmation:
     generic: 'Are you sure?'
     delete_graph: >
@@ -2511,6 +2557,9 @@ en:
     no_answer: 'There is no subject with this id.'
     no_program: 'There is no program with this id.'
     no_division: 'There is no division with this id.'
+    no_tutorial: 'There is no tutorial with this id.'
+    no_submission: There is no submission with this id.
+    no_assignment: There is no assignment with this id.
   activerecord:
     errors:
       no_valid_url: 'This is not a valid URL.'
@@ -2519,6 +2568,12 @@ en:
           attributes:
             details:
               blank: 'You need to give a text.'
+        assignment:
+          attributes:
+            title:
+              taken: >
+                This assignment title is already taken for this event series.
+              blank: You need to giv a title.
         chapter:
           attributes:
             title:
@@ -2635,6 +2690,9 @@ en:
           attributes:
             title:
               blank: 'You need to give a title.'
+        submission:
+          lecture_not_matching: >
+            The tutorial should belong to the same lecture as the assignment.
         tag:
           attributes:
             notions:
@@ -2648,12 +2706,21 @@ en:
             season:
               inclusion: 'Not a valid type.'
               taken: 'This term already exists.'
+        tutorial:
+          attributes:
+            title:
+              taken: >
+                This tutorium title is already taken for this event series.
+              blank: You need to giv a title.
         user:
           attributes:
             courses:
               blank: 'You need to subscribe at least one course.'
             name:
               blank: 'You need to give a display name.'
+        user_submission_join:
+          only_one_per_assignment: >
+            Each user is only allowed one submission per assignment.
         vote:
           attributes:
             clicker:

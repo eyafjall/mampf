@@ -1,0 +1,29 @@
+<div class="card <%= assignment.active? ? 'bg-light' : 'bg-mdb-color-lighten-7' %>">
+	<div class="card-header">
+		<div class="row">
+			<div class="col-12">
+				<h5>
+					<% if assignment.medium %>
+						<%= link_to assignment.title,
+												assignment.medium,
+												class: 'text-dark' %>
+					<% else %>
+						<%= assignment.title %>
+					<% end %>
+				</h5>
+			</div>
+			<div class="col-12">
+				bis
+		    <% if assignment.deadline %>
+    		  <%= I18n.l(assignment.deadline, format: :short, locale: :'de') %>
+    		<% end %>
+			</div>
+		</div>
+	</div>
+	<div class="submissionMain"
+			 data-id="<%= assignment.id %>">
+		<%= render partial: 'submissions/card_main',
+							 locals: { submission: submission,
+							 					 assignment: assignment } %>
+	</div>
+</div>

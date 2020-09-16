@@ -27,6 +27,9 @@ class User < ApplicationRecord
   # a user has many lectures as a teacher
   has_many :given_lectures, class_name: 'Lecture', foreign_key: 'teacher_id'
 
+  # a user has many tutorials as a tutor
+  has_many :given_tutorials, class_name: 'Tutorial', foreign_key: 'tutor_id'
+
   # a user has many notifications as recipient
   has_many :notifications, foreign_key: 'recipient_id'
 
@@ -35,6 +38,10 @@ class User < ApplicationRecord
 
   # a user has many clickers as editor
   has_many :clickers, foreign_key: 'editor_id', dependent: :destroy
+
+  # a user has many submissions (of assignments)
+  has_many :user_submission_joins
+  has_many :submissions, through: :user_submission_joins
 
   # if a homepage is given it should at leat be a valid address
   validates :homepage, http_url: true, if: :homepage?
@@ -52,6 +59,11 @@ class User < ApplicationRecord
 
   # users can comment stuff
   acts_as_commontator
+
+  searchable do
+    text :name
+  end
+
 
   # returns the array of all teachers
   def self.teachers
@@ -294,35 +306,30 @@ class User < ApplicationRecord
   #   is course or lecture editor or teacher and all boards not belonging
   #   to lectures
   # - all boards that belong to subscribed lectures otherwise and all
-  #    boards not belonging
-  #   to lectures
+  #    boards not belonging to lectures
   def thredded_can_read_messageboards
     return Thredded::Messageboard.all if admin?
     subscribed_forums =
       Thredded::Messageboard.where(id: lectures.map(&:forum_id))
-        .or(Thredded::Messageboard.where(id: courses.map(&:forum_id)))
-        .or(Thredded::Messageboard.where.not(id: Lecture.all.map(&:forum_id) +
-                                                 Course.all.map(&:forum_id)))
+        .or(Thredded::Messageboard.where.not(id: Lecture.all.map(&:forum_id)))
     if teacher? || edited_courses.any? || edited_lectures.any?
       return Thredded::Messageboard.where(id: teaching_related_lectures
-                                                  .map(&:forum_id) +
-                                              edited_courses.map(&:forum_id))
+                                                  .map(&:forum_id))
                                    .or(subscribed_forums)
     end
     subscribed_forums
   end
 
   # defines which messageboards a user can write to:
-  # - all those that he/she can read
+  # - all those that he/she can read except those that do not belong to a
+  #   lecture (they are for admins posts only)
   def thredded_can_write_messageboards
     return Thredded::Messageboard.all if admin?
     subscribed_forums =
       Thredded::Messageboard.where(id: lectures.map(&:forum_id))
-        .or(Thredded::Messageboard.where(id: courses.map(&:forum_id)))
     if teacher? || edited_courses.any? || edited_lectures.any?
       return Thredded::Messageboard.where(id: teaching_related_lectures
-                                                  .map(&:forum_id) +
-                                              edited_courses.map(&:forum_id))
+                                                  .map(&:forum_id))
                                    .or(subscribed_forums)
     end
     subscribed_forums
@@ -337,8 +344,7 @@ class User < ApplicationRecord
     return Thredded::Messageboard.all if admin?
     if teacher? || edited_courses.any? || edited_lectures.any?
       return Thredded::Messageboard.where(id: teaching_related_lectures
-                                                  .map(&:forum_id) +
-                                              edited_courses.map(&:forum_id))
+                                                .map(&:forum_id))
     end
     Thredded::Messageboard.none
   end
@@ -411,21 +417,21 @@ class User < ApplicationRecord
     Digest::SHA2.hexdigest(id.to_s + created_at.to_s).first(20)
   end
 
-  def subscribe_teachable!(teachable)
-    return false unless teachable.is_a?(Lecture)
-    return false if teachable.in?(lectures)
-    lectures << teachable
+  def subscribe_lecture!(lecture)
+    return false unless lecture.is_a?(Lecture)
+    return false if lecture.in?(lectures)
+    lectures << lecture
     true
   end
 
-  def unsubscribe_teachable!(teachable)
-    return false unless teachable.is_a?(Lecture)
-    return false unless teachable.in?(lectures)
-    lectures.delete(teachable)
+  def unsubscribe_lecture!(lecture)
+    return false unless lecture.is_a?(Lecture)
+    return false unless lecture.in?(lectures)
+    lectures.delete(lecture)
     true
   end
 
-  def current_teachables
+  def current_subscribed_lectures
     active_lectures.includes(:course, :term).natural_sort_by(&:title) +
       lectures.where(term: nil).natural_sort_by(&:title)
   end

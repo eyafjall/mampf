@@ -25,6 +25,13 @@ Rails.application.routes.draw do
 
   resources :areas, except: [:show]
 
+  get 'assignments/:id/cancel_edit', to: 'assignments#cancel_edit',
+                                   as: 'cancel_edit_assignment'
+  get 'assignments/cancel_new', to: 'assignments#cancel_new',
+                              as: 'cancel_new_assignment'
+
+  resources :assignments, only: [ :new, :edit, :create, :update, :destroy]
+
   get 'chapters/:id/list_sections', to: 'chapters#list_sections',
                                      as: 'list_sections'
   resources :chapters, except: [:index, :show]
@@ -48,27 +55,13 @@ Rails.application.routes.draw do
 
   get 'c/:id', to: 'clickers#show'
 
-  get 'courses/:course_id/food', to: 'media#index',
-                                 as: 'course_food'
   get 'courses/:id/inspect', to: 'courses#inspect',
                              as: 'inspect_course'
-  get 'courses/:id/display', to: 'courses#display',
-                             as: 'display_course'
-  get 'courses/:id/show_random_quizzes', to: 'courses#show_random_quizzes',
-                                         as: 'show_random_quizzes'
   post 'courses/:id/take_random_quiz', to: 'courses#take_random_quiz',
                                       as: 'random_quiz'
   get 'courses/:id/render_question_counter', to: 'courses#render_question_counter',
                                              as: 'render_question_counter'
-  get 'courses/:id/add_forum', to: 'courses#add_forum',
-                                as: 'add_course_forum'
-  get 'courses/:id/lock_forum', to: 'courses#lock_forum',
-                                 as: 'lock_course_forum'
-  get 'courses/:id/unlock_forum', to: 'courses#unlock_forum',
-                                 as: 'unlock_course_forum'
-  get 'courses/:id/destroy_forum', to: 'courses#destroy_forum',
-                                 as: 'destroy_course_forum'
-  resources :courses, except: [:index]
+  resources :courses, except: [:index, :show]
 
   resources :divisions, except: [:show]
 
@@ -107,6 +100,8 @@ Rails.application.routes.draw do
                            as: 'display_item'
   resources :items, only: [:update, :create, :edit, :destroy]
 
+  get 'lectures/:id/food', to: 'media#index',
+                           as: 'lecture_food'
   get 'lectures/:id/inspect', to: 'lectures#inspect',
                                as: 'inspect_lecture'
   get 'lectures/:id/update_teacher', to: 'lectures#update_teacher',
@@ -121,12 +116,12 @@ Rails.application.routes.draw do
                                  as: 'unlock_forum'
   get 'lectures/:id/destroy_forum', to: 'lectures#destroy_forum',
                                  as: 'destroy_forum'
-  get 'lectures/:id/render_sidebar', to: 'lectures#render_sidebar',
-                                     as: 'render_sidebar'
   get 'lectures/:id/show_announcements', to: 'lectures#show_announcements',
                                          as: 'show_announcements'
   get 'lectures/:id/organizational', to: 'lectures#organizational',
                                          as: 'organizational'
+  get 'lectures/:id/show_random_quizzes', to: 'lectures#show_random_quizzes',
+                                         as: 'show_random_quizzes'
   get 'lectures/:id/show_subscribers', to: 'lectures#show_subscribers',
                                        as: 'show_subscribers'
   get 'lectures/:id/show_structures', to: 'lectures#show_structures',
@@ -137,6 +132,8 @@ Rails.application.routes.draw do
                                       as: 'search_examples'
   get 'lectures/search', to: 'lectures#search',
                          as: 'search_lectures'
+  get 'lectures/:id/display_course', to: 'lectures#display_course',
+                                     as: 'display_course'
   post 'lectures/:id/publish', to: 'lectures#publish',
                               as: 'publish_lecture'
   post 'lectures/:id/import_media', to: 'lectures#import_media',
@@ -221,8 +218,8 @@ Rails.application.routes.draw do
   patch 'profile/add_consent', as: 'add_consent'
   put 'profile/add_consent'
   post 'profile/toggle_thread_subscription', as: 'toggle_thread_subscription'
-  patch 'profile/subscribe_teachable', as: 'subscribe_teachable'
-  patch 'profile/unsubscribe_teachable', as: 'unsubscribe_teachable'
+  patch 'profile/subscribe_lecture', as: 'subscribe_lecture'
+  patch 'profile/unsubscribe_lecture', as: 'unsubscribe_lecture'
   get 'profile/show_accordion', as: 'show_accordion'
 
   resources :programs, except: [:show]
@@ -269,6 +266,21 @@ Rails.application.routes.draw do
 
   resources :subjects, except: [:show]
 
+  post 'submissions/join', to: 'submissions#join',
+                            as: 'join_submission'
+  get 'submissions/enter_code', to: 'submissions#enter_code',
+                                as: 'enter_submission_code'
+
+  delete 'submissions/:id/leave', to: 'submissions#leave',
+                                  as: 'leave_submission'
+  get 'submissions/:id/cancel_edit', to: 'submissions#cancel_edit',
+                                   as: 'cancel_edit_submission'
+  get 'submissions/cancel_new', to: 'submissions#cancel_new',
+                              as: 'cancel_new_submission'
+  get 'submissions/:id/show_manuscript', to: 'submissions#show_manuscript',
+                                         as: 'show_submission_manuscript'
+  resources :submissions
+
   get 'tags/modal', to: 'tags#modal',
                     as: 'tag_modal'
   get 'tags/:id/inspect', to: 'tags#inspect',
@@ -289,6 +301,13 @@ Rails.application.routes.draw do
   post 'tags/postprocess', to: 'tags#postprocess',
                            as: 'postprocess_tags'
   resources :tags
+
+  get 'tutorials/:id/cancel_edit', to: 'tutorials#cancel_edit',
+                                   as: 'cancel_edit_tutorial'
+  get 'tutorials/cancel_new', to: 'tutorials#cancel_new',
+                              as: 'cancel_new_tutorial'
+
+  resources :tutorials, only: [ :new, :edit, :create, :update, :destroy]
 
   get 'sections/list_tags', to: 'sections#list_tags',
                              as: 'list_section_tags'
@@ -314,6 +333,8 @@ Rails.application.routes.draw do
                                   as: 'list_generic_users'
   get 'users/fill_user_select', to: 'users#fill_user_select',
                               as: 'fill_user_select'
+  get 'users/list', to: 'users#list',
+                    as: 'list_users'
   resources :users, only: [:index, :edit, :update, :destroy]
 
   get 'examples/:id', to: 'erdbeere#show_example',
@@ -352,6 +373,7 @@ Rails.application.routes.draw do
   mount VideoUploader.upload_endpoint(:cache) => "/videos/upload"
   mount PdfUploader.upload_endpoint(:cache) => "/pdfs/upload"
   mount GeogebraUploader.upload_endpoint(:cache) => "/ggbs/upload"
+  mount UserPdfUploader.upload_endpoint(:cache) => "/user_pdfs/upload"
   mount Thredded::Engine => '/forum'
   get '*path', to: 'main#error'
 

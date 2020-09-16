@@ -2,10 +2,14 @@
 class LecturesController < ApplicationController
   include ActionController::RequestForgeryProtection
   before_action :set_lecture, except: [:new, :create, :search]
+  before_action :set_lecture_cookie, only: [:show, :organizational,
+                                            :show_announcements]
   before_action :set_erdbeere_data, only: [:show_structures, :edit_structures]
   authorize_resource
   before_action :check_for_consent
-  before_action :set_view_locale, only: [:edit, :show, :inspect]
+  before_action :set_view_locale, only: [:edit, :show, :inspect,
+                                         :show_random_quizzes]
+  before_action :check_if_enough_questions, only: [:show_random_quizzes]
   layout 'administration'
 
   def edit
@@ -38,7 +42,6 @@ class LecturesController < ApplicationController
   end
 
   def show
-    cookies[:current_lecture] = @lecture.id
     # deactivate http caching for the moment
     if stale?(etag: @lecture,
               last_modified: [current_user.updated_at,
@@ -113,10 +116,6 @@ class LecturesController < ApplicationController
     redirect_to administration_path
   end
 
-  def render_sidebar
-    @course = @lecture.course
-  end
-
   # add forum for this lecture
   def add_forum
     unless @lecture.forum?
@@ -158,7 +157,6 @@ class LecturesController < ApplicationController
   end
 
   def organizational
-    cookies[:current_lecture] = @lecture.id
     I18n.locale = @lecture.locale_with_inheritance
     render layout: 'application'
   end
@@ -228,12 +226,27 @@ class LecturesController < ApplicationController
     @similar_titles = Course.similar_courses(search_params[:fulltext])
   end
 
+  def show_random_quizzes
+    @course = @lecture.course
+    render layout: 'application'
+  end
+
+  def display_course
+    @course = @lecture.course
+    I18n.locale = @course.locale || @lecture.locale
+    render layout: 'application'
+  end
+
   private
 
   def set_lecture
     @lecture = Lecture.find_by_id(params[:id])
     return if @lecture
     redirect_to :root, alert: I18n.t('controllers.no_lecture')
+  end
+
+  def set_lecture_cookie
+    cookies[:current_lecture_id] = @lecture.id
   end
 
   def set_view_locale
@@ -250,6 +263,8 @@ class LecturesController < ApplicationController
                                     :start_chapter, :absolute_numbering,
                                     :start_section, :organizational, :locale,
                                     :organizational_concept, :muesli,
+                                    :organizational_on_top,
+                                    :disable_teacher_display,
                                     :content_mode, :passphrase, :sort,
                                     :comments_disabled,
                                     editor_ids: [])
@@ -357,5 +372,10 @@ class LecturesController < ApplicationController
                                    term_ids: [],
                                    program_ids: [],
                                    teacher_ids: [])
+  end
+
+  def check_if_enough_questions
+    return if @lecture.course.enough_questions?
+    redirect_to :root, alert: I18n.t('controllers.no_test')
   end
 end
